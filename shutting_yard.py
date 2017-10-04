@@ -13,13 +13,11 @@ class Shutting_yard:
     def split_input_string(self):
         """Split string of input tokens into a list each token"""
 
-        #re.split(r'(\d+|\W+)', 'x+13.5*10x-4e1')
-        #token_list = re.split(r'(\d+|\W+)', self.input_string)
         token_list = shlex.shlex(self.input_string)
         return token_list
 
     def sort_tokens(self):
-        """ Parses input string and sorts tokens into lists of numbers and mathematical operators"""
+        """ Tokens of a input string according to the shunting yard algorithm """
 
         print("input list", [i for i in self.split_input_string()])
 
@@ -34,7 +32,6 @@ class Shutting_yard:
         output_queue = []
         operator_stack = []
 
-
         for token in self.split_input_string():
             try:
                 # If token is a number: append to output"""
@@ -44,26 +41,27 @@ class Shutting_yard:
 
                 # If not a number
                 if token in precedence_dict.keys():
-                    # If operator stack is empty: append token
+                    # If operator stack is empty: append to operator stack
                     if len(operator_stack) == 0:
                         operator_stack.append(token)
+
                     else:
+                        # If top of stack is a right '(': append to operator stack
                         if operator_stack[-1] == "(":
                             operator_stack.append(token)
-                        #If token has higher precedence than top of stack: append token
 
+                        # If token is right associative: append to operator stack
                         elif precedence_dict[token][1] == "right":
                             operator_stack.append(token)
 
+                        # If token has higher precedence than top of stack and is left assoc: append to operator stack
                         elif (precedence_dict[token][0] > precedence_dict[operator_stack[-1]][0]
-                                                        and precedence_dict[token][1] == "left"):
+                                and precedence_dict[token][1] == "left"):
                             operator_stack.append(token)
-                        else:
-                            #If lower than equal precedence, pop from stack to output queue
-                            #and procede until reaching lower precedence or empty stack
 
-                            print(token, "has leq precedence tag than", operator_stack[-1])
-
+          s               else:
+                            # If lower than equal precedence, pop from stack to output queue
+                            # and procede until reaching lower precedence or empty stack
                             while precedence_dict[token] <= precedence_dict[operator_stack[-1]]:
                                 output_queue.append(operator_stack.pop())
                                 if len(operator_stack) == 0:
@@ -71,9 +69,11 @@ class Shutting_yard:
                             operator_stack.append(token)
 
                 else:
-                    print("found a paranthesis", token)
+                    # If token is a '(': append to stack
                     if token == "(":
                         operator_stack.append(token)
+
+                    # If token is a ')' pop from stack to output queue until '(' is reached and poped
                     if token == ")":
                         while operator_stack[-1] is not "(":
                             output_queue.append(operator_stack.pop())

@@ -1,7 +1,6 @@
-import re
 import shlex
 
-class Shutting_yard:
+class Shunting_yard:
 
     def __init__(self, input_string):
         self.input_string = input_string
@@ -12,14 +11,14 @@ class Shutting_yard:
 
 
     def split_input_string(self):
-        """Split string of input tokens into a list each token"""
+        """Split string of input tokens into a list each token using the shlex module"""
 
         token_list = shlex.shlex(self.input_string)
         return token_list
 
 
     def sort_tokens(self):
-        """ Tokens of a input string according to the shunting yard algorithm """
+        """ Tokens of a input string according to the shunting yard algorithm (ref. Wikipedia) """
 
         precedence_dict = {
             '^': [4, "right"],
@@ -83,24 +82,25 @@ class Shutting_yard:
         while len(operator_stack) > 0:
             output_queue.append(operator_stack.pop())
 
+        return output_queue
 
 
-        print('Output string', ' '.join(output_queue))
+    def output_queue_list_2_string(self, output_queue_list):
+        """ Takes list of tokes and joins to string without spaces"""
 
-
-        #for token in self.input_string
-        #    if '+' or '-' in token: #or '*' or '/' in token: # or '(' or ')' in token:
-        #        print(token)
+        return ''.join(output_queue_list)
 
 
 if __name__ == '__main__':
 
     input = "3+4*2/(1-5)^2^3"
 
-    sy = Shutting_yard(input)
+    sy = Shunting_yard(input)
 
     print("input list", [i for i in sy.split_input_string()])
 
-    sy.sort_tokens()
+    output_queue_list = sy.sort_tokens()
+
+    print(sy.output_queue_list_2_string(output_queue_list))
 
     #print(input)

@@ -1,5 +1,4 @@
-#import shlex
-#import re
+
 
 class Shunting_yard:
     """ A class for converting to reverse polish notation """
@@ -11,22 +10,16 @@ class Shunting_yard:
     def read_input_string(self):
         pass
 
-    # Old parser method
-    #def split_input_string(self):
-    #    """Split string of input tokens into a list each token using the shlex module"""
-    #
-    #    token_list = shlex.shlex(self.input_string)
-    #    return token_list
-
-
-    def split_input_string_with_regex(self):
-        """Not complete"""
-
-        return re.findall(r"[-+]?\d*\.\d+|\d+", self.input_string)
-
 
     def split_input_with_functions(self):
-        """ Performs the shunting yard algorithm on tokens separated as list indices"""
+        """Parses the input string into a list of individual tokens
+
+        Tokens are temprarily stored in temp_variable, to which new tokens are added according to a set of rules:
+        - temp_varriable is appended to output_list when a different type or a math symbol is reached
+        - Numbers are added to temp_variable until a non int/float is encountered
+        - Letters, i.e strings not defined in math_syn_list (math symbols) are added until a math symbol is reached
+        - When reaching a ',' og '.', temp_variable is appended to output_lust
+        """
 
         math_sym_list = ['+', '-', '*', '/', '^', '(', ')']
         output_list = []

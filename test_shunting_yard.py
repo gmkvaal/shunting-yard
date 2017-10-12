@@ -25,3 +25,13 @@ def test_input_string_with_functions():
     assert output_string == correct_answer
 
 
+def test_read_input_string():
+    """ Testing shunting yard algorithm by giving by asserting output from a input with a known RPL, including functions"""
+
+    innstr = "2x*sin(2x)"
+    correct_answer = "23max3/3.1415*sin"
+    sy = Shunting_yard(innstr)
+    output_queue_list = sy.sort_tokens()
+    output_string = sy.output_queue_list_2_string(output_queue_list)
+
+    assert output_string == correct_answer

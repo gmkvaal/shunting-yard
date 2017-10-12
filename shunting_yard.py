@@ -7,10 +7,6 @@ class Shunting_yard:
         self.input_string = input_string
 
 
-    def read_input_string(self):
-        pass
-
-
     def split_input_with_functions(self):
         """Parses the input string into a list of individual tokens
 
@@ -74,15 +70,16 @@ class Shunting_yard:
 
         return(output_list)
 
+
     def sort_tokens(self):
         """ Tokens of a input string according to the shunting yard algorithm (ref. Wikipedia) """
 
         precedence_dict = {
-            '^': [4, "right"],
-            '*': [3, "left"],
-            '/': [3, "left"],
-            '+': [2, "left"],
-            '-': [2, "left"]
+            "^": [4, "right"],
+            "*": [3, "left"],
+            "/": [3, "left"],
+            "+": [2, "left"],
+            "-": [2, "left"]
         }
 
         output_queue = []
@@ -124,7 +121,7 @@ class Shunting_yard:
                             # or a left bracket
                             while precedence_dict[token] <= precedence_dict[operator_stack[-1]]:
                                 output_queue.append(operator_stack.pop())
-                                if len(operator_stack) == 0 or operator_stack[-1] == '(':
+                                if len(operator_stack) == 0 or operator_stack[-1] == "(":
                                     break
                             operator_stack.append(token)
 
@@ -153,11 +150,21 @@ class Shunting_yard:
         return output_queue
 
 
-    def output_queue_list_2_string(self, output_queue_list):
-        """ Takes list of tokes and joins to string without spaces"""
+    def output_queue_list_2_string(self):
+        """ Takes list of tokes and joins to string without spaces """
 
-        return ''.join(output_queue_list)
+        return ''.join(self.sort_tokens())
 
+
+    def print_output(self):
+        """ Prints the output """
+
+        print("\n", sy.output_queue_list_2_string())
+
+
+def read_input_string():
+    print("Rules: \n multiply: * \n division: / \n power: ^ \n ")
+    return str(input("Enter an expression to be converted into RPN:"))
 
 if __name__ == '__main__':
 
@@ -167,15 +174,12 @@ if __name__ == '__main__':
     #input = 'sin(3)'
     #input = "22+2a"
     #input = "sin(2a)"
-    input = "sin(2a)"
+    #input = "sin(2a)"
 
-    sy = Shunting_yard(input)
+    sy = Shunting_yard(read_input_string())
 
-    output_list = sy.split_input_with_functions()
-    print(output_list)
+    #output_list = sy.split_input_with_functions()
+    #print(output_list)
 
-    output_queue_list = sy.sort_tokens()
-
-    print(sy.output_queue_list_2_string(output_queue_list))
-
-    #print(input)
+    #sy.sort_tokens()
+    sy.print_output()

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+    <h2>Enter expression to be converted to inverse polish notation</h2>
+    <h3>Rules:</h3>
+    <li> multiply: * </li>
+    <li> division: / </li>
+    <li> power: ^ </li>
+    <p>No spaces between symbols</p>
+    <form action="." method="POST">
+        <input type="text" name="text">
+        <input type="submit" name="my-form" value="Send">
+    </form>
+    {% if output_str %}
+    <ul>
+        <p><em>Input</em>: {{ input_str }} </p>
+        <p><em>Result</em>: {{ output_str }} </p>
+    </ul>
+    {% endif %}
+</body>
+</html>

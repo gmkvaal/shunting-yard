@@ -170,7 +170,7 @@ class Shunting_yard:
     def print_output(self):
         """ Prints the output """
 
-        print("\n", sy.output_queue_list_2_string())
+        print("\n", self.output_queue_list_2_string())
 
 
 def read_input_string():

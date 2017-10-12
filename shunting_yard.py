@@ -75,11 +75,11 @@ class Shunting_yard:
         """ Tokens of a input string according to the shunting yard algorithm (ref. Wikipedia) """
 
         precedence_dict = {
-            "^": [4, "right"],
-            "*": [3, "left"],
-            "/": [3, "left"],
-            "+": [2, "left"],
-            "-": [2, "left"]
+            '^': [4, 'right'],
+            '*': [3, 'left'],
+            '/': [3, 'left'],
+            '+': [2, 'left'],
+            '-': [2, 'left']
         }
 
         output_queue = []
@@ -106,16 +106,16 @@ class Shunting_yard:
 
                     else:
                         # If top of stack is a right '(': append to operator stack
-                        if operator_stack[-1] == "(":
+                        if operator_stack[-1] == '(':
                             operator_stack.append(token)
 
                         # If token is right associative: append to operator stack
-                        elif precedence_dict[token][1] == "right":
+                        elif precedence_dict[token][1] == 'right':
                             operator_stack.append(token)
 
                         # If token has higher precedence than top of stack and is left assoc: append to operator stack
                         elif (precedence_dict[token][0] > precedence_dict[operator_stack[-1]][0]
-                                and precedence_dict[token][1] == "left"):
+                                and precedence_dict[token][1] == 'left'):
                             operator_stack.append(token)
 
                         else:
@@ -124,7 +124,7 @@ class Shunting_yard:
                             # or a left bracket
                             while precedence_dict[token] <= precedence_dict[operator_stack[-1]]:
                                 output_queue.append(operator_stack.pop())
-                                if len(operator_stack) == 0 or operator_stack[-1] == "(":
+                                if len(operator_stack) == 0 or operator_stack[-1] == '(':
                                     break
                             operator_stack.append(token)
 
@@ -177,6 +177,7 @@ def read_input_string():
     print("Rules: \n multiply: * \n division: / \n power: ^ \n ")
     print("Multiplication with unknown variables must be done as '2*x' not '2x'")
     return str(input("Enter an expression to be converted into RPN:"))
+
 
 if __name__ == '__main__':
 

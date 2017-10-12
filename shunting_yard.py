@@ -97,6 +97,9 @@ class Shunting_yard:
             except ValueError:
                 # If not a number
                 if token in precedence_dict.keys():
+
+                    print("token is in precedence list", token)
+
                     # If operator stack is empty: append to operator stack
                     if len(operator_stack) == 0:
                         operator_stack.append(token)
@@ -126,6 +129,10 @@ class Shunting_yard:
                             operator_stack.append(token)
 
                 else:
+
+                    print("token is NOT in precedence list", token)
+
+
                     # If token is a '(': append to stack
                     if token == "(":
                         operator_stack.append(token)
@@ -139,9 +146,13 @@ class Shunting_yard:
                         if operator_stack[-1] not in precedence_dict.keys():
                             output_queue.append(operator_stack.pop())
 
-                    # If token is not a number, math sym, or bracket, it is a function (or operator?)
+                    # If the len of the not number token is 1, it is a algebraic variable (a, x, etc... )
+                    elif len(token) == 1:
+                        output_queue.append(token)
+
+                    # If token is not a number, math symbol, or bracket, it is a function or operator
                     else:
-                       operator_stack.append(token)
+                        operator_stack.append(token)
 
         # Poping remaining tokens from stack to output queue
         while len(operator_stack) > 0:
@@ -164,19 +175,23 @@ class Shunting_yard:
 
 def read_input_string():
     print("Rules: \n multiply: * \n division: / \n power: ^ \n ")
+    print("Multiplication with unknown variables must be done as '2*x' not '2x'")
     return str(input("Enter an expression to be converted into RPN:"))
 
 if __name__ == '__main__':
 
-    #input = "3+4*2/(1-5)^2^3"
-    #input = 'sin(max(2,3)/3*3.1415)'
-    #input = '2+(3*(2+3))'
-    #input = 'sin(3)'
-    #input = "22+2a"
-    #input = "sin(2a)"
-    #input = "sin(2a)"
+    #input_str = "3+4*2/(1-5)^2^3"
+    #input_str = 'sin(max(2,3)/3*3.1415)'
+    #input_str = '2+(3*(2+3))'
+    #input_str = 'sin(3)'
+    input_str = "2*2*a*a"
+    #input_str = "sin(2a)"
+    #input_str = "sin(2a)"
 
-    sy = Shunting_yard(read_input_string())
+
+    #input_str = read_input_string()
+
+    sy = Shunting_yard(input_str)
 
     #output_list = sy.split_input_with_functions()
     #print(output_list)

@@ -1,75 +1,11 @@
+from Parser import parser
 
 
 class Shunting_yard:
     """ A class for converting to reverse polish notation """
 
-    def __init__(self, input_string):
-        self.input_string = input_string
-
-
-    def split_input_with_functions(self):
-        """Parses the input string into a list of individual tokens
-
-        Tokens are temprarily stored in temp_variable, to which new tokens are added according to a set of rules:
-        - temp_varriable is appended to output_list when a different type or a math symbol is reached
-        - Numbers are added to temp_variable until a non int/float is encountered
-        - Letters, i.e strings not defined in math_syn_list (math symbols) are added until a math symbol is reached
-        - When reaching a ',' og '.', temp_variable is appended to output_lust
-        """
-
-        math_sym_list = ['+', '-', '*', '/', '^', '(', ')']
-        output_list = []
-        temp_variable = None
-
-        for symbol in self.input_string:
-            if symbol == ',':
-                output_list.append(temp_variable)
-                temp_variable = None
-
-            elif symbol == '.':
-                try:
-                    int(temp_variable)
-                    temp_variable += symbol
-                except ValueError:
-                    print("Invalid: '.' after non number symbol")
-
-            elif symbol in math_sym_list:
-                if temp_variable != None:
-                    output_list.append(temp_variable)
-                    temp_variable = None
-                output_list.append(symbol)
-
-            else:
-                try:
-                    # If symbol is a number: append to output"""
-                    int(symbol)
-                    if temp_variable == None:
-                        temp_variable = symbol
-
-                    else:
-                        temp_variable += symbol
-
-                except ValueError:
-                    # If symbol is neither a mathematical symbol or a number
-                    if temp_variable == None:
-                        temp_variable = symbol
-
-                    else:
-                        try:
-                            # If temp_variable is a int, append it to output_list and update temp variable
-                            int(temp_variable)
-                            output_list.append(temp_variable)
-                            temp_variable = symbol
-
-                        except ValueError:
-                            # If temp variable is a letter, add to temp variable
-                            temp_variable += symbol
-
-        if temp_variable != None:
-            output_list.append(temp_variable)
-
-        return(output_list)
-
+    def __init__(self, input_list_of_tokens):
+        self.input_list_of_tokens = input_list_of_tokens
 
     def sort_tokens(self):
         """ Tokens of a input string according to the shunting yard algorithm (ref. Wikipedia) """
@@ -85,16 +21,16 @@ class Shunting_yard:
         output_queue = []
         operator_stack = []
 
-        for token in self.split_input_with_functions():
+        for token in self.input_list_of_tokens:
 
             print("token:", token, "output:", output_queue, "stack:", operator_stack)
 
-            try:
+            if token.isdigit():
                 # If token is a number: append to output"""
                 float(token)
                 output_queue.append(token)
 
-            except ValueError:
+            else:
                 # If not a number
                 if token in precedence_dict.keys():
 
@@ -160,18 +96,15 @@ class Shunting_yard:
 
         return output_queue
 
-
     def output_queue_list_2_string(self):
         """ Takes list of tokes and joins to string without spaces """
 
         return ''.join(self.sort_tokens())
 
-
     def print_output(self):
         """ Prints the output """
 
         print("\n", self.output_queue_list_2_string())
-
 
 def read_input_string():
     print("Rules: \n multiply: * \n division: / \n power: ^ \n ")
@@ -192,7 +125,9 @@ if __name__ == '__main__':
 
     #input_str = read_input_string()
 
-    sy = Shunting_yard(input_str)
+
+    input_list = parser(input_str)
+    sy = Shunting_yard(input_list)
 
     #output_list = sy.split_input_with_functions()
     #print(output_list)

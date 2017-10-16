@@ -2,7 +2,10 @@ from Parser import parser
 
 
 class Shunting_yard:
-    """ A class for converting to reverse polish notation """
+    """ A class for converting to reverse polish notation
+
+     Takes list of tokens as input, returns tokens sorted in list
+     """
 
     def __init__(self, input_list_of_tokens):
         self.input_list_of_tokens = input_list_of_tokens
@@ -23,7 +26,7 @@ class Shunting_yard:
 
         for token in self.input_list_of_tokens:
 
-            print("token:", token, "output:", output_queue, "stack:", operator_stack)
+            print('token:', token, 'output:', output_queue, 'stack:', operator_stack)
 
             if token.isdigit():
                 # If token is a number: append to output"""
@@ -34,7 +37,7 @@ class Shunting_yard:
                 # If not a number
                 if token in precedence_dict.keys():
 
-                    print("token is in precedence list", token)
+                    print('token is in precedence list', token)
 
                     # If operator stack is empty: append to operator stack
                     if len(operator_stack) == 0:
@@ -66,16 +69,16 @@ class Shunting_yard:
 
                 else:
 
-                    print("token is NOT in precedence list", token)
+                    print('token is NOT in precedence list', token)
 
 
                     # If token is a '(': append to stack
-                    if token == "(":
+                    if token == '(':
                         operator_stack.append(token)
 
                     # If token is a ')' pop from stack to output queue until '(' is reached and poped
-                    elif token == ")":
-                        while operator_stack[-1] is not "(":
+                    elif token == ')':
+                        while operator_stack[-1] is not '(':
                             output_queue.append(operator_stack.pop())
                         operator_stack.pop()
 
@@ -104,7 +107,7 @@ class Shunting_yard:
     def print_output(self):
         """ Prints the output """
 
-        print("\n", self.output_queue_list_2_string())
+        print('\n', self.output_queue_list_2_string())
 
 def read_input_string():
     print("Rules: \n multiply: * \n division: / \n power: ^ \n ")

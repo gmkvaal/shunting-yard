@@ -1,11 +1,19 @@
 def parser(input_string):
-    """Parses the input string into a list of individual tokens
+    """Parses the input string representing a mathematical expression into a list of individual tokens
 
-    Tokens are temprarily stored in temp_variable, to which new tokens are added according to a set of rules:
-    - temp_varriable is appended to output_list when a different type or a math symbol is reached
-    - Numbers are added to temp_variable until a non int/float is encountered
-    - Letters, i.e strings not defined in math_syn_list (math symbols) are added until a math symbol is reached
-    - When reaching a ',' og '.', temp_variable is appended to output_lust
+       Non-digits are are split only by mathematical symbols or '.'
+       Example:
+           >>> parser('a+b')
+           ['a', '+', 'b']
+
+           >>> parser('sin(a+b)')
+           ['sin', '(', 'a', '+', 'b', ')']
+
+       Tokens are temprarily stored in temp_variable, to which new tokens are added according to a set of rules:
+       - temp_varriable is appended to output_list when a different type or a math symbol is reached
+       - Numbers are added to temp_variable until a non int/float is encountered
+       - Letters, i.e strings not defined in math_syn_list (math symbols) are added until a math symbol is reached
+       - When reaching a ',' og '.', temp_variable is appended to output_lust
     """
 
     math_sym_list = ['+', '-', '*', '/', '^', '(', ')']
@@ -18,10 +26,9 @@ def parser(input_string):
             temp_variable = None
 
         elif symbol == '.':
-            try:
-                int(temp_variable)
+            if temp_variable.isdigit():
                 temp_variable += symbol
-            except ValueError:
+            else:
                 print("Invalid: '.' after non number symbol")
 
         elif symbol in math_sym_list:
@@ -58,3 +65,8 @@ def parser(input_string):
         output_list.append(temp_variable)
 
     return (output_list)
+
+if __name__ == '__main__':
+
+    input_string = "a**b+3.13+max(3,2)-a.b"
+    print(parser(input_string))

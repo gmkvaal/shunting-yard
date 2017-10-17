@@ -1,4 +1,4 @@
-def parser(input_string):
+def Parser(input_string):
     """Parses the input string representing a mathematical expression into a list of individual tokens
 
        Non-digits are are split only by mathematical symbols or '.'
@@ -72,5 +72,5 @@ def parser(input_string):
 
 if __name__ == '__main__':
 
-    input_string = "**(cos(b))"
+    input_string = "a3"
     print(parser(input_string))

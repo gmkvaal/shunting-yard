@@ -1,7 +1,7 @@
-from Parser import parser
+from parser import parser
 
 
-class Shunting_yard:
+class ShuntingYard:
     """ A class for converting to reverse polish notation
 
      Takes list of tokens as input, returns tokens sorted in list

@@ -13,53 +13,27 @@ class SmartParser:
         temp_symbol = None
         output_list = []
 
-
         i = 0
-        #for i in range(len(self.input_string)):
         while i < len(self.input_string):
-            j = 0
             symbol = self.input_string[i]
-
-            if symbol == '':
-                pass
-
-            elif temp_symbol == None:
+            if temp_symbol is None:
                 temp_symbol = symbol
 
-            # If digit or dot, then
-            elif symbol.isdigit() or symbol == '.':
-                # If temp_symbol is also digit
-                if temp_symbol[-1].isdigit(): # or symbol != '.':
-                    print(temp_symbol[-1])
-                    while i+j < len(self.input_string) and (self.input_string[i+j].isdigit() or self.input_string[i+j] == '.'):
-                        temp_symbol += input_string[i + j]
-                        j += 1
+            if symbol == ' ':
+                pass
 
-                    output_list.append({'name': str(temp_symbol),
-                                        'value': float(temp_symbol),
-                                        'type': "NUMBER"
-                                        })
+            if symbol.isdigit():
+                j = 1
+                if temp_symbol[-1].isdigit or temp_symbol[-1] == '.':
+                    while j+i < len(self.input_string) and (self.input_string[i + j].isdigit() or self.input_string == '.'):
+                        temp_symbol += self.input_string[i + j]
+                        j+=1
 
-                # Raise error if no operator between digit and letter
-                else:
-                    raise Exception("Wrong format: {}{}".format(self.input_string[i - 1], self.input_string[i]))
+                    i += j - 1
+                    output_list.append(
+                        temp_symbol)
 
-            else:
-                if symbol == ".":
-                    # If symbol is dot, temp_symbol should be a digit
-                    if temp_symbol[-1].isdigit():
-                        temp_symbol += symbol
-                    else:
-                         raise Exception("Wrong format: {}{}".format(self.input_string[i - 1], self.input_string[i]))
-
-                #elif symbol in self.math_sym_list:
-                #    if temp_symbol
-
-            i += j + 1
-
-
-
-
+            i += 1
         print(output_list)
 
 
@@ -71,5 +45,5 @@ class SmartParser:
 
 if __name__ == '__main__':
 
-    input_string = "3..14"
-    Smart_parser(input_string).tokenize()
+    input_string = "12345"
+    SmartParser(input_string).tokenize()

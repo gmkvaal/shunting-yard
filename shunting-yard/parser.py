@@ -72,5 +72,5 @@ def Parser(input_string):
 
 if __name__ == '__main__':
 
-    input_string = "a3"
-    print(parser(input_string))
+    input_string = "12+3"
+    print(Parser(input_string))

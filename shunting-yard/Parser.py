@@ -16,7 +16,7 @@ def parser(input_string):
        - When reaching a ',' og '.', temp_variable is appended to output_lust
     """
 
-    math_sym_list = ['+', '-', '*', '/', '^', '(', ')']
+    math_sym_list = ['+', '-', '*', '**, ''/', '^', '(', ')']
     output_list = []
     temp_variable = None
 
@@ -66,7 +66,11 @@ def parser(input_string):
 
     return (output_list)
 
+
+
+
+
 if __name__ == '__main__':
 
-    input_string = "a**b+3.13+max(3,2)-a.b"
+    input_string = "**(cos(b))"
     print(parser(input_string))

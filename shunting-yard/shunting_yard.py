@@ -68,10 +68,6 @@ class Shunting_yard:
                             operator_stack.append(token)
 
                 else:
-
-                    print('token is NOT in precedence list', token)
-
-
                     # If token is a '(': append to stack
                     if token == '(':
                         operator_stack.append(token)

@@ -1,4 +1,4 @@
-from Parser import parser
+from Parser import Parser
 
 def test_input_string1():
     """ Testing parser function """

@@ -1,4 +1,8 @@
-def Parser(input_string):
+MATH_SYM_LIST = ('+', '-', '*', '**', '/', '^', '(', ')')
+"""What this is."""
+
+
+def parser(input_string):
     """Parses the input string representing a mathematical expression into a list of individual tokens
 
        Non-digits are are split only by mathematical symbols or '.'
@@ -15,11 +19,10 @@ def Parser(input_string):
        - Letters, i.e strings not defined in math_syn_list (math symbols) are added until a math symbol is reached
        - When reaching a ',' og '.', temp_variable is appended to output_lust
     """
-
-    math_sym_list = ['+', '-', '*', '**, ''/', '^', '(', ')']
     output_list = []
     temp_variable = None
 
+    #for idx, symbol in enumerate(input_string):
     for symbol in input_string:
         if symbol == ',':
             output_list.append(temp_variable)
@@ -31,7 +34,7 @@ def Parser(input_string):
             else:
                 print("Invalid: '.' after non number symbol")
 
-        elif symbol in math_sym_list:
+        elif symbol in MATH_SYM_LIST:
             if temp_variable != None:
                 output_list.append(temp_variable)
                 temp_variable = None
@@ -60,6 +63,9 @@ def Parser(input_string):
                     else:
                         # If temp variable is a letter, add to temp variable
                         temp_variable += symbol
+
+        #for sym in MATH_SYM_LIST:
+        #    if sym == input_string[idx:idx+len()]
 
     if temp_variable != None:
         output_list.append(temp_variable)

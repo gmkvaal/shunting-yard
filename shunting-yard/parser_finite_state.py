@@ -3,7 +3,7 @@ from collections import namedtuple
 import re
 
 StateRet = namedtuple('StateRet', ['next_state', 'done', 'increment', 'append'])
-MATH_SYMBOLS = ('+', '-', '*', '/', '**', '(', ')')
+MATH_SYMBOLS = ('+', '-', '*', '**', '/',  '^', '//', '%', '(', ')')
 
 
 def word_state(char: str, stack: List[str]) -> StateRet:
@@ -24,8 +24,6 @@ def num_pre_dot_state(char: str, stack: List[str]) -> StateRet:
             Tuple of: next state, if state is complete, if read next char, if append char
     """
 
-    #print(char)
-
     if char.isdigit():
         return StateRet(num_pre_dot_state, False, True, True)
 
@@ -43,8 +41,6 @@ def num_post_dot_state(char: str, stack: List[str]) -> StateRet:
     """ Returns:
             Tuple of: next state, if state is complete, if read next char, if append char
     """
-
-    #print(char)
 
     if char.isdigit():
         return StateRet(num_post_dot_state, False, True, True)
@@ -64,13 +60,67 @@ def sym_state(char: str, stack: List[str]) -> StateRet:
             Tuple of: next state, if state is complete, if read next char, if append char
     """
 
-    print(char)
+    if char == '+':
+        return StateRet(plus_state, False, True, True)
 
-    if char != '*':
-        return StateRet(start_state, True, True, True)
+
+
+
+    #if char != '*':
+    #    return StateRet(start_state, True, True, True)
+
+    #if char == '*':
+    #    return StateRet(second_mul_state, False , True, True)
+
+    #if char == ''
+def _pop(char: str, stack: List[str]) -> StateRet:
+    stack.pop()
+
+
+def plus_state(char: str, stack: List[str]) -> StateRet:
+
+    if char == '+':
+        return StateRet(plus_state, False, True, False)
+
+    if char == '-':
+        stack.pop()
+        return StateRet(minus_state, True, True, True)
 
     else:
-        return StateRet(second_mul_state, False , True, True)
+        return StateRet(start_state, True, False, False)
+
+
+def plus_state(char: str, stack: List[str]) -> StateRet:
+
+    if char == '+':
+        return StateRet(plus_state, False, True, False)
+
+    if char == '-':
+        stack.pop()
+        return StateRet(minus_state, True, True, True)
+
+    if char in ['*', '/', '^', '%']:
+        raise Exception("Illegal combination of operators: +{}".format(char))
+
+    else:
+        return StateRet(start_state, True, False, False)
+
+
+def minus_state(char: str, stack: List[str]) -> StateRet:
+
+    if char == '-':
+        return StateRet(plus_state, False, True, False)
+
+    if char == '-':
+        stack.pop()
+        return StateRet(minus_state, True, True, True)
+
+    else:
+        return StateRet(start_state, True, False, False)
+
+
+def non_additive_state(char: str, stack: List[str]) -> StateRet:
+    pass
 
 
 def second_mul_state(char: str, stack: List[str]) -> StateRet:
@@ -110,7 +160,7 @@ if __name__ == '__main__':
 
     'next_state', 'done', 'increment', 'append'
 
-    input_string = "2.2**2+.3/2*(2-3)"
+    input_string = "3+*1"
 
 
 

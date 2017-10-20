@@ -73,13 +73,9 @@ def sym_state(char: str, stack: List[str]) -> StateRet:
             Tuple of: next state, if state is complete, if read next char, if append char
     """
 
-    if char == '+':
+    if char in ['+', '-', '%', '(', ')']:
         stack.append(char)
-        return StateRet(plus_state, False, True)
-
-    if char == '-':
-        stack.append(char)
-        return StateRet(minus_state, False, True)
+        return StateRet(start_state, True, True)
 
     if char == '*':
         stack.append(char)
@@ -89,71 +85,20 @@ def sym_state(char: str, stack: List[str]) -> StateRet:
         stack.append(char)
         return StateRet(div_state, False, True)
 
-    if char in '%':
-        stack.append(char)
-        return StateRet(non_rep_sym_state, False, True)
-
-
-def plus_state(char: str, stack: List[str]) -> StateRet:
-
-    if char == '+':
-        return StateRet(plus_state, False, True)
-
-    elif char == '-':
-        stack.pop()
-        stack.append(char)
-        return StateRet(minus_state, False, True)
-
-    elif char in ['*', '/', '%']:
-        raise Exception("Illegal combination of operators: +{}".format(char))
-
-    else:
-        return StateRet(start_state, True, False)
-
-
-def minus_state(char: str, stack: List[str]) -> StateRet:
-
-    if char == '-':
-        stack.pop()
-        stack.append('+')
-        return StateRet(plus_state, False, True)
-
-    elif char == '+':
-        return StateRet(minus_state, False, True)
-
-    elif char in ['*', '/', '%']:
-        raise Exception("Illegal combination of operators: +{}".format(char))
-
-    if char.isdigit():
-        return StateRet(num_pre_dot_state, False, False)
-
-    else:
-        return StateRet(start_state, True, False)
-
-
-def non_rep_sym_state(char: str, stack: List[str]) -> StateRet:
-
-    if char == '+':
-        return StateRet(non_rep_sym_state, True, True)
-
-    if char == '-': # This can be made more effective, but it works. Maybe create another minus state
-        return StateRet(start_state, True, False)
-
-    if char in ['*', '/', '%']:
-        raise Exception("Illegal combination of operators: {}{}".format(''.join(stack), char))
-
-    else:
-        return StateRet(start_state, False, False)
-
 
 def mul_state(char: str, stack: List[str]) -> StateRet:
     """ Returns:
                 Tuple of: next state, if state is complete, if read next char, if append char
     """
 
+    print(char)
+
     if char == '*':
         stack.append(char)
         return StateRet(start_state, True, True)
+
+    elif char in ['/', '%']:
+        raise Exception("Illegal combination of operators: *{}".format(char))
 
     else:
         return StateRet(start_state, True, False)
@@ -200,7 +145,7 @@ if __name__ == '__main__':
 
     'next_state', 'done', 'increment', 'append'
 
-    input_string = "1*--1"
+    input_string = "1**-sin(2*a)"
 
 
 

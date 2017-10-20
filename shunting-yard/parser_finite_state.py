@@ -2,8 +2,17 @@ from typing import Any, Tuple, List
 from collections import namedtuple
 import re
 
+
+"""
+Finite State Machine algorithm for parsing mathematical expression.
+
+Supports operators in MATH_SYMBOLS tuple (e.g. not binaries)
+"""
+
+
+
 StateRet = namedtuple('StateRet', ['next_state', 'done', 'increment'])
-MATH_SYMBOLS = ('+', '-', '*', '**', '/',  '^', '//', '%', '(', ')')
+MATH_SYMBOLS = ('+', '-', '*', '**', '/', '//', '%', '(', ')')
 
 
 def word_state(char: str, stack: List[str]) -> StateRet:
@@ -72,21 +81,23 @@ def sym_state(char: str, stack: List[str]) -> StateRet:
         stack.append(char)
         return StateRet(minus_state, False, True)
 
+    if char == '*':
+        stack.append(char)
+        return StateRet(mul_state, False, True)
 
-    #if char != '*':
-    #    return StateRet(start_state, True, True, True)
+    if char == '/':
+        stack.append(char)
+        return StateRet(div_state, False, True)
 
-    #if char == '*':
-    #    return StateRet(second_mul_state, False , True, True)
+    if char in '%':
+        stack.append(char)
+        return StateRet(non_rep_sym_state, False, True)
 
-    #if char == ''
-
-
-#def _pop(char: str, stack: List[str]) -> StateRet:
-#    stack.pop()
 
 
 def plus_state(char: str, stack: List[str]) -> StateRet:
+
+    print(char, stack)
 
     if char == '+':
         return StateRet(plus_state, False, True)
@@ -94,9 +105,9 @@ def plus_state(char: str, stack: List[str]) -> StateRet:
     elif char == '-':
         stack.pop()
         stack.append(char)
-        return StateRet(minus_state, False, False)
+        return StateRet(minus_state, False, True)
 
-    elif char in ['*', '/', '^', '%']:
+    elif char in ['*', '/', '%']:
         raise Exception("Illegal combination of operators: +{}".format(char))
 
     else:
@@ -113,19 +124,28 @@ def minus_state(char: str, stack: List[str]) -> StateRet:
     elif char == '+':
         return StateRet(minus_state, False, True)
 
-    elif char in ['*', '/', '^', '%']:
+    elif char in ['*', '/', '%']:
         raise Exception("Illegal combination of operators: +{}".format(char))
 
     else:
         return StateRet(start_state, True, False)
 
 
+def non_rep_sym_state(char: str, stack: List[str]) -> StateRet:
 
-def non_additive_state(char: str, stack: List[str]) -> StateRet:
-    pass
+    # BUG: If entering %+: ending in plus_state with nothing in stack and then dumping the stack!
+
+    if char == '+':
+        return StateRet(plus_state, True, True)
+
+    if char == '-':
+        return StateRet(minus_state, True, False)
+
+    if char in ['*', '/', '%']:
+        raise Exception("Illegal combination of operators: {}{}".format(''.join(stack), char))
 
 
-def second_mul_state(char: str, stack: List[str]) -> StateRet:
+def mul_state(char: str, stack: List[str]) -> StateRet:
     """ Returns:
                 Tuple of: next state, if state is complete, if read next char, if append char
     """
@@ -136,6 +156,21 @@ def second_mul_state(char: str, stack: List[str]) -> StateRet:
 
     else:
         return StateRet(start_state, True, False)
+
+
+def div_state(char: str, stack: List[str]) -> StateRet:
+    """ Returns:
+                Tuple of: next state, if state is complete, if read next char, if append char
+    """
+
+    if char == '/':
+        stack.append(char)
+        return StateRet(start_state, True, True)
+
+    else:
+        return StateRet(start_state, True, False)
+
+
 
 
 def start_state(char: str, stack: List[str]) -> StateRet:
@@ -166,7 +201,7 @@ if __name__ == '__main__':
 
     'next_state', 'done', 'increment', 'append'
 
-    input_string = "3+++---1"
+    input_string = "1%+1"
 
 
 

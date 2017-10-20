@@ -1,4 +1,4 @@
-from parser_finite_state import MATH_SYMBOLS, start_state, word_state, num_pre_dot_state, num_post_dot_state, sym_state
+from tokenizer_FSM import MATH_SYMBOLS, start_state, word_state, num_pre_dot_state, num_post_dot_state, sym_state
 import pytest
 
 

@@ -16,9 +16,10 @@ MATH_SYMBOLS = ('+', '-', '*', '**', '/', '//', '%', '(', ')')
 
 
 def word_state(char: str, stack: List[str]) -> StateRet:
-    """
+    """ Appends word-characters to stack. Dumps when reaching another type.
+
     Returns:
-            Tuple of: next state, if state is complete, if read next char, if append char
+            Tuple of: next state, if state is complete, if read next char, if append char.
     """
 
     if re.match("([a-z]|[A-Z])", char):
@@ -30,8 +31,12 @@ def word_state(char: str, stack: List[str]) -> StateRet:
 
 
 def num_pre_dot_state(char: str, stack: List[str]) -> StateRet:
-    """ Returns:
-            Tuple of: next state, if state is complete, if read next char, if append char
+    """ Appends digits to stack. If reaching dot, switching to num_post_dot_state.
+        Dumps when reaching math symbol / operator. Error if reaching word character,
+        e.g., 2b is not accepted.
+
+    Returns:
+            Tuple of: next state, if state is complete, if read next char, if append char.
     """
 
     if char.isdigit():
@@ -50,8 +55,13 @@ def num_pre_dot_state(char: str, stack: List[str]) -> StateRet:
 
 
 def num_post_dot_state(char: str, stack: List[str]) -> StateRet:
-    """ Returns:
-            Tuple of: next state, if state is complete, if read next char, if append char
+    """ Only called after num_pre_dot_state. Appends digits to stack.
+    Dumps when reaching symbol / operator. Error if reaching dot or word character,
+    e.g., 2b or 1.1.1 are not accepted.
+
+
+    Returns:
+            Tuple of: next state, if state is complete, if read next char, if append char.
     """
 
     if char.isdigit():
@@ -69,7 +79,10 @@ def num_post_dot_state(char: str, stack: List[str]) -> StateRet:
 
 
 def sym_state(char: str, stack: List[str]) -> StateRet:
-    """ Returns:
+    """ Appends symbols / operators. If char is * or /, respective states are called
+    in case token is ** or //.
+
+    Returns:
             Tuple of: next state, if state is complete, if read next char, if append char
     """
 
@@ -87,8 +100,11 @@ def sym_state(char: str, stack: List[str]) -> StateRet:
 
 
 def mul_state(char: str, stack: List[str]) -> StateRet:
-    """ Returns:
-                Tuple of: next state, if state is complete, if read next char, if append char
+    """ Only called if previous char was *. Dumps ** if (current) char is *,
+    raises exception of char is / % (illegal combination). Else returns start_state
+
+    Returns:
+        Tuple of: next state, if state is complete, if read next char, if append char
     """
 
     print(char)
@@ -97,28 +113,36 @@ def mul_state(char: str, stack: List[str]) -> StateRet:
         stack.append(char)
         return StateRet(start_state, True, True)
 
-    elif char in ['/', '%']:
-        raise Exception("Illegal combination of operators: *{}".format(char))
+    #elif char in ['/', '%']:
+    #    raise Exception("Illegal combination of operators: *{}".format(char))
 
     else:
         return StateRet(start_state, True, False)
 
 
 def div_state(char: str, stack: List[str]) -> StateRet:
-    """ Returns:
-                Tuple of: next state, if state is complete, if read next char, if append char
+    """ Only called if previous char was *. Dumps ** if (current) char is *,
+    raises exception of char is / % (illegal combination). Else returns start_state
+
+    Returns:
+        Tuple of: next state, if state is complete, if read next char, if append char
     """
 
     if char == '/':
         stack.append(char)
         return StateRet(start_state, True, True)
 
+    #elif char in ['/', '%']:
+    #    raise Exception("Illegal combination of operators: *{}".format(char))
+
     else:
         return StateRet(start_state, True, False)
 
 
 def start_state(char: str, stack: List[str]) -> StateRet:
-    """ Returns:
+    """  Start state. Directs to respective states.
+
+    Returns:
             Tuple of: next state, if state is complete, if read next char, if append char
     """
 

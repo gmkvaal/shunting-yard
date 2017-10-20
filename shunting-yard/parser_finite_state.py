@@ -94,10 +94,7 @@ def sym_state(char: str, stack: List[str]) -> StateRet:
         return StateRet(non_rep_sym_state, False, True)
 
 
-
 def plus_state(char: str, stack: List[str]) -> StateRet:
-
-    print(char, stack)
 
     if char == '+':
         return StateRet(plus_state, False, True)
@@ -127,22 +124,26 @@ def minus_state(char: str, stack: List[str]) -> StateRet:
     elif char in ['*', '/', '%']:
         raise Exception("Illegal combination of operators: +{}".format(char))
 
+    if char.isdigit():
+        return StateRet(num_pre_dot_state, False, False)
+
     else:
         return StateRet(start_state, True, False)
 
 
 def non_rep_sym_state(char: str, stack: List[str]) -> StateRet:
 
-    # BUG: If entering %+: ending in plus_state with nothing in stack and then dumping the stack!
-
     if char == '+':
-        return StateRet(plus_state, True, True)
+        return StateRet(non_rep_sym_state, True, True)
 
-    if char == '-':
-        return StateRet(minus_state, True, False)
+    if char == '-': # This can be made more effective, but it works. Maybe create another minus state
+        return StateRet(start_state, True, False)
 
     if char in ['*', '/', '%']:
         raise Exception("Illegal combination of operators: {}{}".format(''.join(stack), char))
+
+    else:
+        return StateRet(start_state, False, False)
 
 
 def mul_state(char: str, stack: List[str]) -> StateRet:
@@ -169,8 +170,6 @@ def div_state(char: str, stack: List[str]) -> StateRet:
 
     else:
         return StateRet(start_state, True, False)
-
-
 
 
 def start_state(char: str, stack: List[str]) -> StateRet:
@@ -201,7 +200,7 @@ if __name__ == '__main__':
 
     'next_state', 'done', 'increment', 'append'
 
-    input_string = "1%+1"
+    input_string = "1*--1"
 
 
 

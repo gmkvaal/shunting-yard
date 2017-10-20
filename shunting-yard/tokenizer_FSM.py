@@ -1,4 +1,4 @@
-from typing import Any, Tuple, List
+from typing import List
 from collections import namedtuple
 import re
 
@@ -9,10 +9,34 @@ Finite State Machine algorithm for parsing mathematical expression.
 Supports operators in MATH_SYMBOLS tuple (e.g. not binaries)
 """
 
-
-
 StateRet = namedtuple('StateRet', ['next_state', 'done', 'increment'])
 MATH_SYMBOLS = ('+', '-', '*', '**', '/', '//', '%', '(', ')')
+
+
+def start_state(char: str, stack: List[str]) -> StateRet:
+    """  Start state. Directs  to respective states.
+
+    Returns:
+            Tuple of: next state, if state is complete, if read next char, if append char
+    """
+
+    if char.isdigit():
+        stack.append(char)
+        return StateRet(num_pre_dot_state, False, True)
+
+    elif char == '.':
+        stack.append(char)
+        return StateRet(num_post_dot_state, False, True)
+
+    elif char in MATH_SYMBOLS:
+        return StateRet(sym_state, False, False)
+
+    elif re.match('([a-z]|[A-Z])', char):
+        stack.append(char)
+        return StateRet(word_state, False, True)
+
+    else:
+        raise Exception('Illegal character:{}'.format(char))
 
 
 def word_state(char: str, stack: List[str]) -> StateRet:
@@ -32,8 +56,8 @@ def word_state(char: str, stack: List[str]) -> StateRet:
 
 def num_pre_dot_state(char: str, stack: List[str]) -> StateRet:
     """ Appends digits to stack. If reaching dot, switching to num_post_dot_state.
-        Dumps when reaching math symbol / operator. Error if reaching word character,
-        e.g., 2b is not accepted.
+    Dumps when reaching math symbol / operator. Error if reaching word character,
+    e.g., 2b is not accepted.
 
     Returns:
             Tuple of: next state, if state is complete, if read next char, if append char.
@@ -58,7 +82,6 @@ def num_post_dot_state(char: str, stack: List[str]) -> StateRet:
     """ Only called after num_pre_dot_state. Appends digits to stack.
     Dumps when reaching symbol / operator. Error if reaching dot or word character,
     e.g., 2b or 1.1.1 are not accepted.
-
 
     Returns:
             Tuple of: next state, if state is complete, if read next char, if append char.
@@ -139,37 +162,11 @@ def div_state(char: str, stack: List[str]) -> StateRet:
         return StateRet(start_state, True, False)
 
 
-def start_state(char: str, stack: List[str]) -> StateRet:
-    """  Start state. Directs to respective states.
-
-    Returns:
-            Tuple of: next state, if state is complete, if read next char, if append char
-    """
-
-    if char.isdigit():
-        stack.append(char)
-        return StateRet(num_pre_dot_state, False, True)
-
-    elif char == '.':
-        stack.append(char)
-        return StateRet(num_post_dot_state, False, True)
-
-    elif char in MATH_SYMBOLS:
-        return StateRet(sym_state, False, False)
-
-    elif re.match('([a-z]|[A-Z])', char):
-        stack.append(char)
-        return StateRet(word_state, False, True)
-
-    else:
-        raise Exception('Illegal character:{}'.format(char))
-
-
 if __name__ == '__main__':
 
     'next_state', 'done', 'increment', 'append'
 
-    input_string = "1**-sin(2*a)"
+    input_string = "1***-sin(2*a)"
 
 
 

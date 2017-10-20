@@ -24,26 +24,37 @@ def test_start_state():
     return_state = start_state(char, stack)
     assert return_state == (num_post_dot_state, False, True)
 
-"""
+
 def test_word_state():
 
     stack = []
     for char in "aAzZ":
         return_state = word_state(char, stack)
         assert return_state  == (word_state, False, True)
-"""
+
+    for char in MATH_SYMBOLS:
+        return_state = word_state(char, stack)
+        assert return_state == (start_state, True, False)
+
+    for char in ['1']:
+        return_state = word_state(char, stack)
+        assert return_state == (start_state, True, False)
 
 
 def test_pre_num_state():
 
     stack = []
-    for char in map(str, range(0,9)):
+    for i, char in enumerate(map(str, range(0,9))):
         return_state = num_pre_dot_state(char, stack)
         assert return_state  == (num_pre_dot_state, False, True)
+        assert stack[i] == char
 
+    stack = []
     for char in '.':
         return_state = num_pre_dot_state(char, stack)
         assert return_state == (num_post_dot_state, False, True)
+        assert stack[-1] == char
+
 
     for char in MATH_SYMBOLS:
         return_state = num_pre_dot_state(char, stack)
@@ -55,24 +66,34 @@ def test_pre_num_state():
         assert str(excinfo.value) == "Missing operator between number and letter: {}{}".format(''.join(stack), char)
 
 
-def test_pre_num_state():
+def test_post_num_state():
 
     stack = []
-    for char in map(str, range(0,9)):
+    for i, char in enumerate(map(str, range(0, 9))):
         return_state = num_post_dot_state(char, stack)
         assert return_state  == (num_post_dot_state, False, True)
+        assert stack[i] == char
 
     for char in '.':
         with pytest.raises(Exception) as excinfo:
             num_post_dot_state(char, stack)
         assert str(excinfo.value) == "Too many dots: {}.". format(''.join(stack))
 
+    stack = []
     for char in MATH_SYMBOLS:
         return_state = num_post_dot_state(char, stack)
         assert return_state == (sym_state, True, False)
+        assert stack == []
 
     for char in "aAzZ":
         with pytest.raises(Exception) as excinfo:
             num_post_dot_state(char, stack)
         assert str(excinfo.value) == "Missing operator between number and letter: {}{}".format(''.join(stack), char)
 
+
+def test_sym_state():
+
+    stack = []
+    for char in ['+', '-', '%', '(', ')']:
+        return_state = sym_state(char, stack)
+        assert return_state  == (start_state, True, True)

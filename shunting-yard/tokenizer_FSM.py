@@ -190,12 +190,14 @@ def tokenizer(input_string):
         if return_state.increment:
             idx += 1
 
-        if return_state.done or idx == len(input_string):
+        if return_state.done: # or idx == len(input_string):
+            print(state.__name__, stack)
             append_token(stack, state, output_list)
-
             stack = []
-            if idx == len(input_string):
-                break
+
+        if idx == len(input_string):
+            append_token(stack, return_state.next_state, output_list)
+            break
 
         state = return_state.next_state
 
@@ -206,5 +208,6 @@ def tokenizer(input_string):
 if __name__ == '__main__':
 
     input_string = "1**-max(4,2)*cos(3)"
+    input_string = "2+2"
 
     print(tokenizer(input_string))

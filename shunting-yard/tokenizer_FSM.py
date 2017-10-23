@@ -36,7 +36,8 @@ def start_state(char: str, stack: List[str]) -> StateRet:
         return StateRet(word_state, False, True)
 
     else:
-        raise Exception('Illegal character:{}'.format(char))
+        raise Exception('Illegal character or '
+                        'illegal character placement:{}'.format(char))
 
 
 def word_state(char: str, stack: List[str]) -> StateRet:
@@ -49,6 +50,9 @@ def word_state(char: str, stack: List[str]) -> StateRet:
     if re.match("([a-z]|[A-Z])", char):
         stack.append(char)
         return StateRet(word_state, False, True)
+
+    elif char == ',':
+        return StateRet(comma_state, True, False)
 
     else:
         return StateRet(start_state, True, False)
@@ -71,11 +75,15 @@ def num_pre_dot_state(char: str, stack: List[str]) -> StateRet:
         stack.append(char)
         return StateRet(num_post_dot_state, False, True)
 
+    elif char == ',':
+        return StateRet(comma_state, True, False)
+
     elif char in MATH_SYMBOLS:
         return StateRet(sym_state, True, False)
 
     else:
-        raise Exception("Missing operator between number and letter: {}{}".format(''.join(stack), char))
+        raise Exception("Missing operator between number and letter: "
+                        "{}{}".format(''.join(stack), char))
 
 
 def num_post_dot_state(char: str, stack: List[str]) -> StateRet:
@@ -94,11 +102,15 @@ def num_post_dot_state(char: str, stack: List[str]) -> StateRet:
     elif char in MATH_SYMBOLS:
         return StateRet(sym_state, True, False)
 
+    elif char == ',':
+        return StateRet(comma_state, True, False)
+
     elif char == '.':
         raise Exception("Too many dots: {}.". format(''.join(stack)))
 
     else:
-        raise Exception("Missing operator between number and letter: {}{}".format(''.join(stack), char))
+        raise Exception("Missing operator between number and letter: "
+                        "{}{}".format(''.join(stack), char))
 
 
 def sym_state(char: str, stack: List[str]) -> StateRet:
@@ -124,13 +136,11 @@ def sym_state(char: str, stack: List[str]) -> StateRet:
 
 def mul_state(char: str, stack: List[str]) -> StateRet:
     """ Only called if previous char was *. Dumps ** if (current) char is *,
-    raises exception of char is / % (illegal combination). Else returns start_state
+    else returns start_state
 
     Returns:
         Tuple of: next state, if state is complete, if read next char, if append char
     """
-
-    print(char)
 
     if char == '*':
         stack.append(char)
@@ -145,7 +155,7 @@ def mul_state(char: str, stack: List[str]) -> StateRet:
 
 def div_state(char: str, stack: List[str]) -> StateRet:
     """ Only called if previous char was *. Dumps ** if (current) char is *,
-    raises exception of char is / % (illegal combination). Else returns start_state
+    else returns start_state
 
     Returns:
         Tuple of: next state, if state is complete, if read next char, if append char
@@ -162,13 +172,16 @@ def div_state(char: str, stack: List[str]) -> StateRet:
         return StateRet(start_state, True, False)
 
 
+def comma_state(char: str, stack: List[str]) -> StateRet:
+    """Only called when char is comma"""
+
+    stack.append(char)
+    return StateRet(start_state, True, True)
+
+
 if __name__ == '__main__':
 
-    'next_state', 'done', 'increment', 'append'
-
-    input_string = "1***-sin(2*a)"
-
-
+    input_string = "1**-max(a,2)"
 
     stack = []
     output_list = []

@@ -5,8 +5,8 @@ import pytest
 
 def test_tokenizer():
 
-    input_string = "1**-max(a,2)*cos(3)"
-    correct_answer = ['1', '**', '-', 'max', '(', 'a', ',', '2', ')', '*', 'cos', '(', '3', ')' ]
+    input_string = "1**-max(4,2)*cos(3)"
+    correct_answer = ['1', '**', '-', 'max', '(', '4', ',', '2', ')', '*', 'cos', '(', '3', ')' ]
     output_list = tokenizer(input_string)
     assert output_list == correct_answer
 

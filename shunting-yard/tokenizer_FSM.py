@@ -191,12 +191,7 @@ def tokenizer(input_string):
             idx += 1
 
         if return_state.done or idx == len(input_string):
-            print(state.__name__, ''.join(stack))
-
             append_token(stack, state, output_list)
-
-            #output_list.append(''.join(stack))
-
 
             stack = []
             if idx == len(input_string):

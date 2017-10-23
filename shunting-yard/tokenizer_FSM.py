@@ -179,26 +179,21 @@ def comma_state(char: str, stack: List[str]) -> StateRet:
     return StateRet(start_state, True, True)
 
 
-if __name__ == '__main__':
-
-    input_string = "1**-max(a,2)"
+def tokenizer(input_string):
+    """Splits an input string into list of tokens by
+    a finite state machine algorithm"""
 
     stack = []
     output_list = []
-
     idx = 0
     state = start_state
 
     while True:
         char = input_string[idx]
-
         return_state = state(char, stack)
 
         if return_state.increment:
-            idx +=1
-
-        #if return_state.append:
-        #    stack.append(char)
+            idx += 1
 
         if return_state.done or idx == len(input_string):
             output_list.append(''.join(stack))
@@ -208,4 +203,11 @@ if __name__ == '__main__':
 
         state = return_state.next_state
 
-    print(output_list)
+    return output_list
+
+
+if __name__ == '__main__':
+
+    input_string = "1**-max(a,2)*cos(3)"
+
+    print(tokenizer(input_string))

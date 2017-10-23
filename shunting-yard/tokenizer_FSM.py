@@ -1,5 +1,7 @@
 from typing import List
+from settings import MATH_SYMBOLS
 from collections import namedtuple
+from token_classifier import append_token
 import re
 
 
@@ -10,14 +12,13 @@ Supports operators in MATH_SYMBOLS tuple (e.g. not binaries)
 """
 
 StateRet = namedtuple('StateRet', ['next_state', 'done', 'increment'])
-MATH_SYMBOLS = ('+', '-', '*', '**', '/', '//', '%', '(', ')')
 
 
 def start_state(char: str, stack: List[str]) -> StateRet:
     """  Start state. Directs  to respective states.
 
     Returns:
-            Tuple of: next state, if state is complete, if read next char, if append char
+            Tuple of: next state, if state is complete (never), if read next char, if append char
     """
 
     if char.isdigit():
@@ -146,9 +147,6 @@ def mul_state(char: str, stack: List[str]) -> StateRet:
         stack.append(char)
         return StateRet(start_state, True, True)
 
-    #elif char in ['/', '%']:
-    #    raise Exception("Illegal combination of operators: *{}".format(char))
-
     else:
         return StateRet(start_state, True, False)
 
@@ -164,9 +162,6 @@ def div_state(char: str, stack: List[str]) -> StateRet:
     if char == '/':
         stack.append(char)
         return StateRet(start_state, True, True)
-
-    #elif char in ['/', '%']:
-    #    raise Exception("Illegal combination of operators: *{}".format(char))
 
     else:
         return StateRet(start_state, True, False)
@@ -196,7 +191,8 @@ def tokenizer(input_string):
             idx += 1
 
         if return_state.done or idx == len(input_string):
-            output_list.append(''.join(stack))
+            append_token(stack, state, output_list)
+
             stack = []
             if idx == len(input_string):
                 break
@@ -206,8 +202,9 @@ def tokenizer(input_string):
     return output_list
 
 
+
 if __name__ == '__main__':
 
-    input_string = "1**-max(a,2)*cos(3)"
+    input_string = "1**-max(4,2)*cos(3)"
 
     print(tokenizer(input_string))

@@ -89,7 +89,7 @@ def num_pre_dot_state(char: str, stack: List[str]) -> StateRet:
 def num_post_dot_state(char: str, stack: List[str]) -> StateRet:
     """ Only called after num_pre_dot_state. Appends digits to stack.
     Dumps when reaching symbol / operator. Error if reaching dot or word character,
-    e.g., 2b or 1.1.1 are not accepted.
+    e.g., 2b or 1.1.1 are not accepted
 
     Returns:
             Tuple of: next state, if state is complete, if read next char, if append char.

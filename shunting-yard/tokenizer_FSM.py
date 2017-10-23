@@ -18,7 +18,7 @@ def start_state(char: str, stack: List[str]) -> StateRet:
     """  Start state. Directs  to respective states.
 
     Returns:
-            Tuple of: next state, if state is complete, if read next char, if append char
+            Tuple of: next state, if state is complete (never), if read next char, if append char
     """
 
     if char.isdigit():
@@ -187,14 +187,17 @@ def tokenizer(input_string):
         char = input_string[idx]
         return_state = state(char, stack)
 
-
         if return_state.increment:
             idx += 1
 
         if return_state.done or idx == len(input_string):
             print(state.__name__, ''.join(stack))
 
-            output_list.append(''.join(stack))
+            append_token(stack, state, output_list)
+
+            #output_list.append(''.join(stack))
+
+
             stack = []
             if idx == len(input_string):
                 break

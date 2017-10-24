@@ -8,7 +8,7 @@ import re
 """
 Finite State Machine algorithm for parsing mathematical expression.
 
-Supports operators in MATH_SYMBOLS tuple (e.g. not binaries)
+Supports operators in MATH_SYMBOLS tuple (e.g. not binary operators)
 """
 
 StateRet = namedtuple('StateRet', ['next_state', 'done', 'increment'])
@@ -79,11 +79,11 @@ def num_pre_dot_state(char: str, stack: List[str]) -> StateRet:
     elif char == ',':
         return StateRet(comma_state, True, False)
 
-    elif char in MATH_SYMBOLS:
+    elif char in MATH_SYMBOLS and char != '(':
         return StateRet(sym_state, True, False)
 
     else:
-        raise Exception("Missing operator between number and letter: "
+        raise Exception("Missing operator between: "
                         "{}{}".format(''.join(stack), char))
 
 
@@ -100,7 +100,7 @@ def num_post_dot_state(char: str, stack: List[str]) -> StateRet:
         stack.append(char)
         return StateRet(num_post_dot_state, False, True)
 
-    elif char in MATH_SYMBOLS:
+    elif char in MATH_SYMBOLS and char != '(':
         return StateRet(sym_state, True, False)
 
     elif char == ',':
@@ -110,7 +110,7 @@ def num_post_dot_state(char: str, stack: List[str]) -> StateRet:
         raise Exception("Too many dots: {}.". format(''.join(stack)))
 
     else:
-        raise Exception("Missing operator between number and letter: "
+        raise Exception("Missing operator between: "
                         "{}{}".format(''.join(stack), char))
 
 
@@ -168,7 +168,7 @@ def left_parenthesis_state(char: str, stack: List[str]) -> StateRet:
 
 def right_parenthesis_state(char: str, stack: List[str]) -> StateRet:
 
-    if re.match('[0-9]'):
+    if re.match('[0-9]', char):
         raise Exception("Missing operator between right parenthesis and number: "
                         "){}".format(char))
 
@@ -182,8 +182,14 @@ def right_parenthesis_state(char: str, stack: List[str]) -> StateRet:
 
 def operator_state(char: str, stack: List[str]) -> StateRet:
 
-    if char in MATH_SYMBOLS and char not in ['(']:
+    if char in MATH_SYMBOLS and char not in ['(', '+', '-']:
         raise Exception('Operator after operator')
+
+    if char == '+':
+        return StateRet(plus_post_operator_state, False, False)
+
+    if char == '-':
+        return StateRet(minus_post_operator_state, False, False)
 
     else:
         return StateRet(start_state, False, False)
@@ -229,8 +235,8 @@ def plus_post_operator_state(char: str, stack: List[str]) -> StateRet:
         return StateRet(plus_post_operator_state, False, True)
 
     elif char == '-':
-        stack.pop()
-        stack.append(char)
+        #stack.pop()
+        #stack.append(char)
         return StateRet(minus_post_operator_state, False, False)
 
     elif char in ['*', '/', '^', '%']:
@@ -242,22 +248,24 @@ def plus_post_operator_state(char: str, stack: List[str]) -> StateRet:
 
 def minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
 
+    print('yo', char, stack)
     if char == '-':
-        if len(stack) == 1:
-            stack.pop()
-        else:
-            stack.append('-')
+        #if len(stack) == 1:
+        #    stack.pop()
+        #else:
+        #    stack.append('-')
         return StateRet(minus_post_operator_state, False, True)
 
     elif char == '+':
         return StateRet(minus_post_operator_state, False, True)
 
-    elif char in ['*', '/', '^', '%']:
+    elif char in ['*', '/', '%']:
         raise Exception("Illegal combination of operators: +{}".format(char))
 
     else:
-        stack.append('1')
-        return StateRet(artificial_mul_state, True, False)
+        if len(stack) == 1:
+            stack.pop()
+        return StateRet(negative_unary_state, False, False)
 
 
 def mul_state(char: str, stack: List[str]) -> StateRet:
@@ -310,9 +318,9 @@ def div_state(char: str, stack: List[str]) -> StateRet:
         return StateRet(start_state, True, False)
 
 
-def artificial_mul_state(char: str, stack: List[str]) -> StateRet:
+def negative_unary_state(char: str, stack: List[str]) -> StateRet:
 
-    stack.append('*')
+    stack.append('-u')
     return StateRet(start_state, True, False)
 
 
@@ -361,7 +369,9 @@ def tokenizer(input_string):
 
 if __name__ == '__main__':
 
-    #input_string = 'cos(2+-2)'
-    input_string = "2-+-+-2"
+    input_string = "1**+-1--1"
+    #input_string = "2(-2"
+
+    #print(tokenizer(input_string))
 
     print([token['name'] for token in tokenizer(input_string)])

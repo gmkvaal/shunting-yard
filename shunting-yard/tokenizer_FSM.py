@@ -1,6 +1,6 @@
 from typing import List
-from settings import MATH_SYMBOLS
 from collections import namedtuple
+from settings import MATH_SYMBOLS
 from token_classifier import append_token
 import re
 
@@ -135,6 +135,40 @@ def sym_state(char: str, stack: List[str]) -> StateRet:
         return StateRet(div_state, False, True)
 
 
+def plus_state(char: str, stack: List[str]) -> StateRet:
+
+    if char == '+':
+        return StateRet(plus_state, False, True)
+
+    elif char == '-':
+        stack.pop()
+        stack.append(char)
+        return StateRet(minus_state, False, False)
+
+    elif char in ['*', '/', '^', '%']:
+        raise Exception("Illegal combination of operators: +{}".format(char))
+
+    else:
+        return StateRet(start_state, True, False)
+
+
+def minus_state(char: str, stack: List[str]) -> StateRet:
+
+    if char == '-':
+        stack.pop()
+        stack.append('+')
+        return StateRet(plus_state, False, True)
+
+    elif char == '+':
+        return StateRet(minus_state, False, True)
+
+    elif char in ['*', '/', '^', '%']:
+        raise Exception("Illegal combination of operators: +{}".format(char))
+
+    else:
+        return StateRet(start_state, True, False)
+
+
 def mul_state(char: str, stack: List[str]) -> StateRet:
     """ Only called if previous char was *. Dumps ** if (current) char is *,
     else returns start_state
@@ -191,7 +225,7 @@ def tokenizer(input_string):
             idx += 1
 
         if return_state.done: # or idx == len(input_string):
-            print(state.__name__, stack)
+            #print(state.__name__, stack)
             append_token(stack, state, output_list)
             stack = []
 

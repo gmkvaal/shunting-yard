@@ -1,5 +1,6 @@
 from settings import OPERATOR_LIST
 
+# TODO: ADD OPERATOR ASSOCIATIVITY AND PRECEDENCE
 
 def append_token(stack, state, output_list):
 
@@ -21,7 +22,9 @@ def append_token(stack, state, output_list):
                             'minus_post_operator_state',
                             'artificial_mul_state',
                             'operator_state',
-                            'negative_unary_state'
+                            'negative_unary_state',
+                            'left_parenthesis_state',
+                            'right_parenthesis_state'
                             ]:
         token_value = None
         token_type = 'OPERATOR'

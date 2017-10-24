@@ -152,6 +152,12 @@ def sym_state(char: str, stack: List[str]) -> StateRet:
 
 
 def left_parenthesis_state(char: str, stack: List[str]) -> StateRet:
+    """ Called after sym_state. Raises exception if the next
+    char is a non-additive operator
+
+    Returns:
+        Tuple of: next state, if state is complete, if read next char, if append char
+    """
 
     if char in MATH_SYMBOLS and char not in ['+', '-']:
         raise Exception("Non addidive operator after left parenthsis: ({}.".format(char))
@@ -167,6 +173,12 @@ def left_parenthesis_state(char: str, stack: List[str]) -> StateRet:
 
 
 def right_parenthesis_state(char: str, stack: List[str]) -> StateRet:
+    """ Called after sym_state. Raises exception if the next
+    char is a number or a letter (operator)
+
+    Returns:
+        Tuple of: next state, if state is complete, if read next char, if append char
+    """
 
     if re.match('[0-9]', char):
         raise Exception("Missing operator between right parenthesis and number: "
@@ -181,6 +193,12 @@ def right_parenthesis_state(char: str, stack: List[str]) -> StateRet:
 
 
 def operator_state(char: str, stack: List[str]) -> StateRet:
+    """ Called when a non-additive operator is complete. Raises exception if
+    the next char is a non additive operator or right parenthesis.
+
+     Returns:
+        Tuple of: next state, if state is complete, if read next char, if append char
+    """
 
     if char in MATH_SYMBOLS and char not in ['(', '+', '-']:
         raise Exception('Operator after operator')
@@ -196,6 +214,12 @@ def operator_state(char: str, stack: List[str]) -> StateRet:
 
 
 def plus_state(char: str, stack: List[str]) -> StateRet:
+    """ Called when the previous char was a + not preceded by an operator.
+    Switches signs if next is -, raises exception of next a non additive operator
+
+     Returns:
+        Tuple of: next state, if state is complete, if read next char, if append char
+    """
 
     if char == '+':
         return StateRet(plus_state, False, True)
@@ -213,6 +237,12 @@ def plus_state(char: str, stack: List[str]) -> StateRet:
 
 
 def minus_state(char: str, stack: List[str]) -> StateRet:
+    """ Called when the previous char was a - not preceded by an operator.
+    Switches signs if next is -, raises exception of next a non additive operator
+
+     Returns:
+        Tuple of: next state, if state is complete, if read next char, if append char
+    """
 
     if char == '-':
         stack.pop()
@@ -231,6 +261,12 @@ def minus_state(char: str, stack: List[str]) -> StateRet:
 
 
 def plus_post_operator_state(char: str, stack: List[str]) -> StateRet:
+    """ Called when the previous char was a + preceded by an operator.
+    Raises exception of next a non additive operator
+
+     Returns:
+        Tuple of: next state, if state is complete, if read next char, if append char
+    """
 
     if char == '+':
         return StateRet(plus_post_operator_state, False, True)
@@ -248,13 +284,14 @@ def plus_post_operator_state(char: str, stack: List[str]) -> StateRet:
 
 
 def minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
+    """ Called when the previous char was a - preceded by an operator.
+    Raises exception of next a non additive operator
 
-    print('yo', char, stack)
+     Returns:
+        Tuple of: next state, if state is complete, if read next char, if append char
+    """
+
     if char == '-':
-        #if len(stack) == 1:
-        #    stack.pop()
-        #else:
-        #    stack.append('-')
         return StateRet(minus_post_operator_state, False, True)
 
     elif char == '+':
@@ -264,8 +301,8 @@ def minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
         raise Exception("Illegal combination of operators: +{}".format(char))
 
     else:
-        if len(stack) == 1:
-            stack.pop()
+        #if len(stack) == 1:
+        #    stack.pop()
         return StateRet(negative_unary_state, False, False)
 
 
@@ -320,6 +357,12 @@ def div_state(char: str, stack: List[str]) -> StateRet:
 
 
 def negative_unary_state(char: str, stack: List[str]) -> StateRet:
+    """ Only called if the minus_post_operator_state is followed by an
+    accepted character. Appends the unitary operator to the stack
+
+    Returns:
+        Tuple of: next state, if state is complete, if read next char, if append char
+    """
 
     stack.append('-u')
     return StateRet(start_state, True, False)
@@ -341,11 +384,16 @@ def tokenizer(input_string):
     idx = 0
     state = start_state
 
+    #if input_string[0] in MATH_SYMBOLS:
+    #    if input_string[0] == '+':
+    #        idx += 1
+    #    if input_string[0] == '-':
+
     while True:
         char = input_string[idx]
         return_state = state(char, stack)
 
-        print(char, state.__name__, stack)
+        #print(char, state.__name__, stack)
 
         if return_state.increment:
             idx += 1
@@ -370,8 +418,8 @@ def tokenizer(input_string):
 
 if __name__ == '__main__':
 
-    input_string = "1**+-1-+--+1"
-    #input_string = "2(-2"
+    input_string = "+/"
+    input_string = "2-(-2)"
 
     #print(tokenizer(input_string))
 

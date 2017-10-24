@@ -216,7 +216,8 @@ def minus_state(char: str, stack: List[str]) -> StateRet:
 
     if char == '-':
         stack.pop()
-        return StateRet(start_state, False, True)
+        stack.append('+')
+        return StateRet(plus_state, False, True)
 
     elif char == '+':
         return StateRet(minus_state, False, True)
@@ -369,7 +370,7 @@ def tokenizer(input_string):
 
 if __name__ == '__main__':
 
-    input_string = "1**+-1--1"
+    input_string = "1**+-1-+--+1"
     #input_string = "2(-2"
 
     #print(tokenizer(input_string))

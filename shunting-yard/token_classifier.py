@@ -9,7 +9,10 @@ def append_token(stack, state, output_list):
         token_value = float(token)
         token_type = 'NUMBER'
 
-    elif state.__name__ in ['sym_state', 'div_state', 'mul_state', 'comma_state']:
+    elif state.__name__ in ['sym_state', 'div_state', 'mul_state',
+                            'comma_state', 'plus_state', 'minus_state',
+                            'plus_post_operator_state', 'minus_post_operator_state',
+                            'artificial_mul_state']:
         token_value = None
         token_type = 'OPERATOR'
 

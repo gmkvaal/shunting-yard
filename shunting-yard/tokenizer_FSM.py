@@ -122,9 +122,25 @@ def sym_state(char: str, stack: List[str]) -> StateRet:
             Tuple of: next state, if state is complete, if read next char, if append char
     """
 
-    if char in ['+', '-', '%', '(', ')']:
+    if char in '(':
         stack.append(char)
-        return StateRet(start_state, True, True)
+        return StateRet(left_parenthesis_state, True, True)
+
+    if char in ')':
+        stack.append(char)
+        return StateRet(right_parenthesis_state, True, True)
+
+    if char == '%':
+        stack.append(char)
+        return StateRet(operator_state, True, True)
+
+    if char == '-':
+        stack.append(char)
+        return StateRet(minus_state, False, True)
+
+    if char == '+':
+        stack.append(char)
+        return StateRet(plus_state, False, True)
 
     if char == '*':
         stack.append(char)
@@ -135,6 +151,44 @@ def sym_state(char: str, stack: List[str]) -> StateRet:
         return StateRet(div_state, False, True)
 
 
+def left_parenthesis_state(char: str, stack: List[str]) -> StateRet:
+
+    if char in MATH_SYMBOLS and char not in ['+', '-']:
+        raise Exception("Non addidive operator after left parenthsis: ({}.".format(char))
+
+    if char == '+':
+        return StateRet(plus_post_operator_state, True, False)
+
+    if char == '-':
+        return StateRet(minus_post_operator_state, True, False)
+
+    else:
+        return StateRet(start_state, False, False)
+
+
+def right_parenthesis_state(char: str, stack: List[str]) -> StateRet:
+
+    if re.match('[0-9]'):
+        raise Exception("Missing operator between right parenthesis and number: "
+                        "){}".format(char))
+
+    if re.match("([a-z]|[A-Z])", char):
+        raise Exception("Missing operator between right parenthesis and letter: "
+                        "){}".format(char))
+
+    else:
+        return StateRet(start_state, False, False)
+
+
+def operator_state(char: str, stack: List[str]) -> StateRet:
+
+    if char in MATH_SYMBOLS and char not in ['(']:
+        raise Exception('Operator after operator')
+
+    else:
+        return StateRet(start_state, False, False)
+
+
 def plus_state(char: str, stack: List[str]) -> StateRet:
 
     if char == '+':
@@ -143,7 +197,7 @@ def plus_state(char: str, stack: List[str]) -> StateRet:
     elif char == '-':
         stack.pop()
         stack.append(char)
-        return StateRet(minus_state, False, False)
+        return StateRet(minus_state, False, True)
 
     elif char in ['*', '/', '^', '%']:
         raise Exception("Illegal combination of operators: +{}".format(char))
@@ -156,17 +210,54 @@ def minus_state(char: str, stack: List[str]) -> StateRet:
 
     if char == '-':
         stack.pop()
-        stack.append('+')
-        return StateRet(plus_state, False, True)
+        return StateRet(start_state, False, True)
 
     elif char == '+':
         return StateRet(minus_state, False, True)
 
     elif char in ['*', '/', '^', '%']:
-        raise Exception("Illegal combination of operators: +{}".format(char))
+        raise Exception("Illegal combination of operators: {}"
+                        "after additive operator".format(char))
 
     else:
         return StateRet(start_state, True, False)
+
+
+def plus_post_operator_state(char: str, stack: List[str]) -> StateRet:
+
+    if char == '+':
+        return StateRet(plus_post_operator_state, False, True)
+
+    elif char == '-':
+        stack.pop()
+        stack.append(char)
+        return StateRet(minus_post_operator_state, False, False)
+
+    elif char in ['*', '/', '^', '%']:
+        raise Exception("Illegal combination of operators: +{}".format(char))
+
+    else:
+        return StateRet(start_state, False, False)
+
+
+def minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
+
+    if char == '-':
+        if len(stack) == 1:
+            stack.pop()
+        else:
+            stack.append('-')
+        return StateRet(minus_post_operator_state, False, True)
+
+    elif char == '+':
+        return StateRet(minus_post_operator_state, False, True)
+
+    elif char in ['*', '/', '^', '%']:
+        raise Exception("Illegal combination of operators: +{}".format(char))
+
+    else:
+        stack.append('1')
+        return StateRet(artificial_mul_state, True, False)
 
 
 def mul_state(char: str, stack: List[str]) -> StateRet:
@@ -179,7 +270,16 @@ def mul_state(char: str, stack: List[str]) -> StateRet:
 
     if char == '*':
         stack.append(char)
-        return StateRet(start_state, True, True)
+        return StateRet(operator_state, True, True)
+
+    if char == '+':
+        return StateRet(plus_post_operator_state, True, False)
+
+    if char == '-':
+        return StateRet(minus_post_operator_state, True, False)
+
+    if char in ['/', ')', '%']:
+        raise Exception("Illegal combination: *{}".format(char))
 
     else:
         return StateRet(start_state, True, False)
@@ -195,10 +295,25 @@ def div_state(char: str, stack: List[str]) -> StateRet:
 
     if char == '/':
         stack.append(char)
-        return StateRet(start_state, True, True)
+        return StateRet(operator_state, True, True)
+
+    if char == '+':
+        return StateRet(plus_post_operator_state, True, False)
+
+    if char == '-':
+        return StateRet(minus_post_operator_state, True, False)
+
+    if char in ['*', ')', '%']:
+        raise Exception("Illegal combination: /{}".format(char))
 
     else:
         return StateRet(start_state, True, False)
+
+
+def artificial_mul_state(char: str, stack: List[str]) -> StateRet:
+
+    stack.append('*')
+    return StateRet(start_state, True, False)
 
 
 def comma_state(char: str, stack: List[str]) -> StateRet:
@@ -221,16 +336,21 @@ def tokenizer(input_string):
         char = input_string[idx]
         return_state = state(char, stack)
 
+        print(char, state.__name__, stack)
+
         if return_state.increment:
             idx += 1
 
-        if return_state.done: # or idx == len(input_string):
-            #print(state.__name__, stack)
+        if return_state.done:
             append_token(stack, state, output_list)
             stack = []
 
         if idx == len(input_string):
-            append_token(stack, return_state.next_state, output_list)
+            if not return_state.done:
+                if stack[-1].isdigit() or stack[-1] == ")":
+                    append_token(stack, return_state.next_state, output_list)
+                else:
+                    raise Exception('Ending expression with non-digit nor right parenthesis')
             break
 
         state = return_state.next_state
@@ -241,7 +361,7 @@ def tokenizer(input_string):
 
 if __name__ == '__main__':
 
-    input_string = "1**-max(4,2)*cos(3)"
-    input_string = "2+2"
+    #input_string = 'cos(2+-2)'
+    input_string = "2-+-+-2"
 
-    print(tokenizer(input_string))
+    print([token['name'] for token in tokenizer(input_string)])

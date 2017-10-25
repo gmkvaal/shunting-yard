@@ -40,8 +40,6 @@ def append_token(stack, state, output_list):
 
     elif state.__name__ == 'func_state':
 
-        print('yooo')
-
         token_value = None
 
         if token in OPERATOR_LIST:
@@ -72,8 +70,6 @@ def append_token(stack, state, output_list):
          'associativity': associativity
         }
     )
-
-    print(output_list)
 
 if __name__ == '__main__':
     from tokenizer_FSM import num_post_dot_state

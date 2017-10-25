@@ -18,7 +18,8 @@ def start_state(char: str, stack: List[str]) -> StateRet:
     """  Start state. Directs  to respective states.
 
     Returns:
-            Tuple of: next state, if state is complete (never), if read next char, if append char
+            Tuple of: next state, if state is complete (never),
+             if read next char, if append char
     """
 
     if char.isdigit():
@@ -46,7 +47,8 @@ def func_state(char: str, stack: List[str]) -> StateRet:
     Raises exception if next is not (
 
     Returns:
-            Tuple of: next state, if state is complete, if read next char, if append char.
+            Tuple of: next state, if state is complete,
+            if read next char, if append char.
     """
 
     if re.match("([a-z]|[A-Z])", char):
@@ -65,20 +67,23 @@ def post_func_state(char: str, stack: List[str]) -> StateRet:
     by an right parenthesis
 
     Returns:
-        Tuple of: next state, if state is complete, if read next char, if append char.
+        Tuple of: next state, if state is complete,
+        if read next char, if append char.
     """
 
     stack.append(char)
+
     return StateRet(left_parenthesis_state, True, True)
 
 
 def num_pre_dot_state(char: str, stack: List[str]) -> StateRet:
-    """ Appends digits to stack. If reaching dot, switching to num_post_dot_state.
-    Dumps when reaching math symbol / operator. Error if reaching word character,
-    e.g., 2b is not accepted.
+    """ Appends digits to stack. If reaching dot, switching to
+    num_post_dot_state. Dumps when reaching math symbol / operator.
+    Error if reaching word character, e.g., 2b is not accepted.
 
     Returns:
-            Tuple of: next state, if state is complete, if read next char, if append char.
+            Tuple of: next state, if state is complete,
+            if read next char, if append char.
     """
 
     if char.isdigit():
@@ -102,11 +107,12 @@ def num_pre_dot_state(char: str, stack: List[str]) -> StateRet:
 
 def num_post_dot_state(char: str, stack: List[str]) -> StateRet:
     """ Only called after num_pre_dot_state. Appends digits to stack.
-    Dumps when reaching symbol / operator. Error if reaching dot or word character,
-    e.g., 2b or 1.1.1 are not accepted
+    Dumps when reaching symbol / operator. Error if reaching dot or word
+    character, e.g., 2b or 1.1.1 are not accepted
 
     Returns:
-            Tuple of: next state, if state is complete, if read next char, if append char.
+            Tuple of: next state, if state is complete,
+            if read next char, if append char.
     """
 
     if char.isdigit():
@@ -128,11 +134,12 @@ def num_post_dot_state(char: str, stack: List[str]) -> StateRet:
 
 
 def sym_state(char: str, stack: List[str]) -> StateRet:
-    """ Appends symbols / operators. If char is * or /, respective states are called
-    in case token is ** or //.
+    """ Appends symbols / operators. If char is * or /,
+    respective states are called in case token is ** or //.
 
     Returns:
-            Tuple of: next state, if state is complete, if read next char, if append char
+            Tuple of: next state, if state is complete,
+            if read next char, if append char
     """
 
     if char in '(':
@@ -169,11 +176,13 @@ def left_parenthesis_state(char: str, stack: List[str]) -> StateRet:
     char is a non-additive operator
 
     Returns:
-        Tuple of: next state, if state is complete, if read next char, if append char
+        Tuple of: next state, if state is complete,
+        if read next char, if append char
     """
 
     if char in MATH_SYMBOLS and char not in ['+', '-', '(']:
-        raise Exception("Non addidive operator after left parenthsis: ({}.".format(char))
+        raise Exception("Non addidive operator after left parenthsis: "
+                        "({}.".format(char))
 
     if char == '+':
         return StateRet(plus_post_operator_state, False, False)
@@ -190,27 +199,30 @@ def right_parenthesis_state(char: str, stack: List[str]) -> StateRet:
     char is a number or a letter (operator)
 
     Returns:
-        Tuple of: next state, if state is complete, if read next char, if append char
+        Tuple of: next state, if state is complete,
+        if read next char, if append char
     """
 
     if re.match('[0-9]', char):
-        raise Exception("Missing operator between right parenthesis and number: "
-                        "){}".format(char))
+        raise Exception("Missing operator between right parenthesis "
+                        "and number: ){}".format(char))
 
     if re.match("([a-z]|[A-Z])", char):
-        raise Exception("Missing operator between right parenthesis and letter: "
-                        "){}".format(char))
+        raise Exception("Missing operator between right parenthesis "
+                        "and letter: ){}".format(char))
 
     else:
         return StateRet(start_state, False, False)
 
 
 def operator_state(char: str, stack: List[str]) -> StateRet:
-    """ Called when a non-additive operator is complete. Raises exception if
-    the next char is a non additive operator or right parenthesis.
+    """ Called when a non-additive operator is complete.
+    Raises exception if the next char is a non additive
+    operator or right parenthesis.
 
      Returns:
-        Tuple of: next state, if state is complete, if read next char, if append char
+        Tuple of: next state, if state is complete,
+        if read next char, if append char
     """
 
     if char in MATH_SYMBOLS and char not in ['(', '+', '-']:
@@ -228,10 +240,12 @@ def operator_state(char: str, stack: List[str]) -> StateRet:
 
 def plus_state(char: str, stack: List[str]) -> StateRet:
     """ Called when the previous char was a + not preceded by an operator.
-    Switches signs if next is -, raises exception of next a non additive operator
+    Switches signs if next is -, raises exception of next a non additive
+    operator
 
      Returns:
-        Tuple of: next state, if state is complete, if read next char, if append char
+        Tuple of: next state, if state is complete,
+        if read next char, if append char
     """
 
     if char == '+':
@@ -251,10 +265,12 @@ def plus_state(char: str, stack: List[str]) -> StateRet:
 
 def minus_state(char: str, stack: List[str]) -> StateRet:
     """ Called when the previous char was a - not preceded by an operator.
-    Switches signs if next is -, raises exception of next a non additive operator
+    Switches signs if next is -, raises exception of next a non additive
+    operator
 
      Returns:
-        Tuple of: next state, if state is complete, if read next char, if append char
+        Tuple of: next state, if state is complete,
+        if read next char, if append char
     """
 
     if char == '-':
@@ -303,7 +319,7 @@ def minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
     """
 
     if char == '-':
-       return StateRet(minus_minus_post_operator_state, False, False)
+        return StateRet(minus_minus_post_operator_state, False, False)
 
     elif char == '+':
         return StateRet(minus_post_operator_state, False, True)
@@ -420,23 +436,18 @@ def tokenizer(input_string):
     idx = 0
     state = start_state
 
-    #if input_string[0] in MATH_SYMBOLS:
-    #    if input_string[0] == '+':
-    #        idx += 1
-    #    if input_string[0] == '-':
-
     while True:
         char = input_string[idx]
         return_state = state(char, stack)
 
-        #print(char, state.__name__, stack)
+        # print(char, state.__name__, stack)
 
         if return_state.increment:
             idx += 1
 
         if return_state.done:
 
-            #print('appending', stack)
+            # print('appending', stack)
 
             append_token(stack, state, output_list)
             stack = []
@@ -454,13 +465,10 @@ def tokenizer(input_string):
     return output_list
 
 
-
 if __name__ == '__main__':
 
-    #input_string = "cos(2)"
+    # input_string = "cos(2)"
     input_string = "2*-(---2--1)"
-
-
 
     print(tokenizer(input_string))
 

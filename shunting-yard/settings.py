@@ -12,3 +12,25 @@ for operator in builtin_operators:
 
 OPERATOR_LIST = tuple(OPERATOR_LIST)
 MATH_SYMBOLS = ('+', '-', '*', '**', '/', '//', '%', '(', ')')
+
+OPERATOR_PRECEDENCE = {
+                       '**': 1,
+                       '-u': 2,
+                       '*': 3,
+                       '/': 3,
+                       '%': 3,
+                       '//': 3,
+                       '+': 4,
+                       '-': 4
+                       }
+
+OPERATOR_ASSOCIATIVITY = {
+                          '**': 'RIGHT',
+                          '-u': 'RIGHT',
+                          '*': 'LEFT',
+                          '/': 'LEFT',
+                          '%': 'LEFT',
+                          '//': 'LEFT',
+                          '+': 'LEFT',
+                          '-': 'LEFT',
+                          }

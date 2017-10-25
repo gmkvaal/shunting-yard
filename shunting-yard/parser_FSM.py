@@ -429,7 +429,7 @@ def tokenizer(input_string):
         char = input_string[idx]
         return_state = state(char, stack)
 
-        print(char, state.__name__, stack)
+        #print(char, state.__name__, stack)
 
         if return_state.increment:
             idx += 1
@@ -457,9 +457,11 @@ def tokenizer(input_string):
 
 if __name__ == '__main__':
 
-    input_string = "+/"
+    #input_string = "cos(2)"
     input_string = "2*-(---2--1)"
 
-    #print(tokenizer(input_string))
+
+
+    print(tokenizer(input_string))
 
     print([token['name'] for token in tokenizer(input_string)])

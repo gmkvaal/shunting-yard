@@ -1,4 +1,4 @@
-from settings import OPERATOR_LIST
+from settings import OPERATOR_LIST, OPERATOR_PRECEDENCE, OPERATOR_ASSOCIATIVITY
 
 # TODO: ADD OPERATOR ASSOCIATIVITY AND PRECEDENCE
 
@@ -6,13 +6,14 @@ def append_token(stack, state, output_list):
 
     token  = ''.join(stack)
 
-    if state.__name__ in ['num_pre_dot_state',
+    if state.__name__ in ('num_pre_dot_state',
                           'num_post_dot_state'
-                          ]:
+                          ):
+
         token_value = float(token)
         token_type = 'NUMBER'
 
-    elif state.__name__ in ['sym_state',
+    elif state.__name__ in ('sym_state',
                             'div_state',
                             'mul_state',
                             'comma_state',
@@ -23,16 +24,27 @@ def append_token(stack, state, output_list):
                             'artificial_mul_state',
                             'operator_state',
                             'negative_unary_state',
-                            'left_parenthesis_state',
-                            'right_parenthesis_state',
                             'post_func_state'
-                            ]:
+                            ):
+
         token_value = None
-        token_type = 'OPERATOR'
+
+        if token == '(':
+            token_type = 'LEFT_PARENTHESIS'
+
+        elif token == ')':
+            token_type = 'RIGHT_PARENTHESIS'
+
+        else:
+            token_type = 'OPERATOR'
 
     elif state.__name__ == 'func_state':
+
+        print('yooo')
+
+        token_value = None
+
         if token in OPERATOR_LIST:
-            token_value = None
             token_type = 'OPERATOR'
         else:
             raise Exception('Undefined operator: {}'.format(token))
@@ -40,13 +52,28 @@ def append_token(stack, state, output_list):
     else:
         raise Exception('Unknown state: {}'. format(state))
 
+    if token in OPERATOR_PRECEDENCE.keys():
+        precedence = OPERATOR_PRECEDENCE[token]
+
+    else:
+        precedence = None
+
+    if token in OPERATOR_ASSOCIATIVITY.keys():
+        associativity = OPERATOR_ASSOCIATIVITY[token]
+
+    else:
+        associativity = None
+
     output_list.append(
         {'name': token,
          'value': token_value,
-         'type': token_type
+         'type': token_type,
+         'precedence': precedence,
+         'associativity': associativity
         }
     )
 
+    print(output_list)
 
 if __name__ == '__main__':
     from tokenizer_FSM import num_post_dot_state

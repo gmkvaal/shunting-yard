@@ -101,8 +101,8 @@ def num_pre_dot_state(char: str, stack: List[str]) -> StateRet:
         return StateRet(sym_state, True, False)
 
     else:
-        raise Exception("Missing operator between: "
-                        "{}{}".format(''.join(stack), char))
+        raise Exception('Missing operator between: '
+                        '{}{}'.format(''.join(stack), char))
 
 
 def num_post_dot_state(char: str, stack: List[str]) -> StateRet:
@@ -126,11 +126,11 @@ def num_post_dot_state(char: str, stack: List[str]) -> StateRet:
         return StateRet(comma_state, True, False)
 
     elif char == '.':
-        raise Exception("Too many dots: {}.". format(''.join(stack)))
+        raise Exception('Too many dots: {}.'. format(''.join(stack)))
 
     else:
-        raise Exception("Missing operator between: "
-                        "{}{}".format(''.join(stack), char))
+        raise Exception('Missing operator between: '
+                        '{}{}'.format(''.join(stack), char))
 
 
 def sym_state(char: str, stack: List[str]) -> StateRet:
@@ -181,8 +181,8 @@ def left_parenthesis_state(char: str, stack: List[str]) -> StateRet:
     """
 
     if char in MATH_SYMBOLS and char not in ['+', '-', '(']:
-        raise Exception("Non addidive operator after left parenthsis: "
-                        "({}.".format(char))
+        raise Exception('Non addidive operator after left parenthsis: '
+                        '({}.'.format(char))
 
     if char == '+':
         return StateRet(plus_post_operator_state, False, False)
@@ -204,12 +204,12 @@ def right_parenthesis_state(char: str, stack: List[str]) -> StateRet:
     """
 
     if re.match('[0-9]', char):
-        raise Exception("Missing operator between right parenthesis "
+        raise Exception('Missing operator between right parenthesis '
                         "and number: ){}".format(char))
 
-    if re.match("([a-z]|[A-Z])", char):
-        raise Exception("Missing operator between right parenthesis "
-                        "and letter: ){}".format(char))
+    if re.match('([a-z]|[A-Z])', char):
+        raise Exception('Missing operator between right parenthesis '
+                        'and letter: ){}'.format(char))
 
     else:
         return StateRet(start_state, False, False)
@@ -304,7 +304,7 @@ def plus_post_operator_state(char: str, stack: List[str]) -> StateRet:
         return StateRet(minus_post_operator_state, False, False)
 
     elif char in MATH_SYMBOLS and char not in ['(', '+', '-']:
-        raise Exception("Illegal combination of operators: +{}".format(char))
+        raise Exception('Illegal combination of operators: +{}'.format(char))
 
     else:
         return StateRet(start_state, False, False)
@@ -389,7 +389,7 @@ def mul_state(char: str, stack: List[str]) -> StateRet:
         return StateRet(minus_post_operator_state, True, False)
 
     if char in MATH_SYMBOLS and char not in ['+', '-', '*', '(']:
-        raise Exception("Illegal combination: *{}".format(char))
+        raise Exception('Illegal combination: *{}'.format(char))
 
     else:
         return StateRet(start_state, True, False)
@@ -414,7 +414,7 @@ def div_state(char: str, stack: List[str]) -> StateRet:
         return StateRet(minus_post_operator_state, True, False)
 
     if char in MATH_SYMBOLS and char not in ['+', '-', '/', '(']:
-        raise Exception("Illegal combination: /{}".format(char))
+        raise Exception('Illegal combination: /{}'.format(char))
 
     else:
         return StateRet(start_state, True, False)
@@ -468,7 +468,7 @@ def tokenizer(input_string):
 if __name__ == '__main__':
 
     # input_string = "cos(2)"
-    input_string = "2*-(---2--1)"
+    input_string = '2*-(---2--1)'
 
     print(tokenizer(input_string))
 

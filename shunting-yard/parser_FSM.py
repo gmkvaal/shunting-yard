@@ -308,13 +308,26 @@ def minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
     elif char == '+':
         return StateRet(minus_post_operator_state, False, True)
 
-    elif char in ['*', '/', '%']:
+    elif char in MATH_SYMBOLS and char not in ['(', '+', '-']:
         raise Exception("Illegal combination of operators: +{}".format(char))
 
     else:
-        if stack[-1] == '-':
-            stack.pop()
-        return StateRet(negative_unary_state, False, False)
+        return StateRet(leave_minus_post_operator_state, False, False)
+
+
+def leave_minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
+    """ Only called after minus_post_operator_state. Pops if minus in stack
+
+    Returns:
+         negative_unary_state, False, False
+    """
+    if len(stack) == 0:
+        pass
+
+    elif stack[-1] == '-':
+        stack.pop()
+
+    return StateRet(negative_unary_state, False, False)
 
 
 def minus_minus_post_operator_state(char: str, stack: List[str]):
@@ -359,7 +372,7 @@ def mul_state(char: str, stack: List[str]) -> StateRet:
     if char == '-':
         return StateRet(minus_post_operator_state, True, False)
 
-    if char in ['/', ')', '%']:
+    if char in MATH_SYMBOLS and char not in ['+', '-', '*', '(']:
         raise Exception("Illegal combination: *{}".format(char))
 
     else:
@@ -384,7 +397,7 @@ def div_state(char: str, stack: List[str]) -> StateRet:
     if char == '-':
         return StateRet(minus_post_operator_state, True, False)
 
-    if char in ['*', ')', '%']:
+    if char in MATH_SYMBOLS and char not in ['+', '-', '/', '(']:
         raise Exception("Illegal combination: /{}".format(char))
 
     else:
@@ -445,7 +458,7 @@ def tokenizer(input_string):
 if __name__ == '__main__':
 
     input_string = "+/"
-    input_string = "2%--2"
+    input_string = "2*-(---2--1)"
 
     #print(tokenizer(input_string))
 

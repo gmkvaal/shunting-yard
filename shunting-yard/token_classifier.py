@@ -24,12 +24,13 @@ def append_token(stack, state, output_list):
                             'operator_state',
                             'negative_unary_state',
                             'left_parenthesis_state',
-                            'right_parenthesis_state'
+                            'right_parenthesis_state',
+                            'post_func_state'
                             ]:
         token_value = None
         token_type = 'OPERATOR'
 
-    elif state.__name__ == 'word_state':
+    elif state.__name__ == 'func_state':
         if token in OPERATOR_LIST:
             token_value = None
             token_type = 'OPERATOR'

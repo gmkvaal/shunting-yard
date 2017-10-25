@@ -34,14 +34,14 @@ def start_state(char: str, stack: List[str]) -> StateRet:
 
     elif re.match('([a-z]|[A-Z])', char):
         stack.append(char)
-        return StateRet(word_state, False, True)
+        return StateRet(func_state, False, True)
 
     else:
         raise Exception('Illegal character or '
                         'illegal character placement:{}'.format(char))
 
 
-def word_state(char: str, stack: List[str]) -> StateRet:
+def func_state(char: str, stack: List[str]) -> StateRet:
     """ Appends word-characters to stack. Dumps when reaching another type.
 
     Returns:
@@ -50,13 +50,29 @@ def word_state(char: str, stack: List[str]) -> StateRet:
 
     if re.match("([a-z]|[A-Z])", char):
         stack.append(char)
-        return StateRet(word_state, False, True)
+        return StateRet(func_state, False, True)
 
     elif char == ',':
         return StateRet(comma_state, True, False)
 
     else:
-        return StateRet(start_state, True, False)
+        return StateRet(post_func_state, True, False)
+
+
+def post_func_state(char: str, stack: List[str]) -> StateRet:
+    """ Only called after func_state. Verifies that the function is followed
+    by an right parenthesis
+
+    Returns:
+        Tuple of: next state, if state is complete, if read next char, if append char.
+    """
+
+    if char == '(':
+        return StateRet(start_state, True, True)
+
+    else:
+        raise Exception('Illigal character placement: {}, '
+                        'operators must be followed by ('.format(char))
 
 
 def num_pre_dot_state(char: str, stack: List[str]) -> StateRet:
@@ -163,10 +179,10 @@ def left_parenthesis_state(char: str, stack: List[str]) -> StateRet:
         raise Exception("Non addidive operator after left parenthsis: ({}.".format(char))
 
     if char == '+':
-        return StateRet(plus_post_operator_state, True, False)
+        return StateRet(plus_post_operator_state, False, False)
 
     if char == '-':
-        return StateRet(minus_post_operator_state, True, False)
+        return StateRet(minus_post_operator_state, False, False)
 
     else:
         return StateRet(start_state, False, False)
@@ -399,6 +415,9 @@ def tokenizer(input_string):
             idx += 1
 
         if return_state.done:
+
+            #print('appending', stack)
+
             append_token(stack, state, output_list)
             stack = []
 
@@ -419,7 +438,7 @@ def tokenizer(input_string):
 if __name__ == '__main__':
 
     input_string = "+/"
-    input_string = "2-(-2)"
+    input_string = "2-(-2)*cos(2*-++3)*max3"
 
     #print(tokenizer(input_string))
 

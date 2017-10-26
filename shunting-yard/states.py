@@ -42,7 +42,7 @@ def start_state(char: str, stack: List[str]) -> StateRet:
 
 
 def func_state(char: str, stack: List[str]) -> StateRet:
-    """Rules for tokenizing word characters,
+    """Rules for tokenizing word characters.
 
     Appends word-characters to stack.
     Dumps char to stack when reaching (.
@@ -69,9 +69,9 @@ def func_state(char: str, stack: List[str]) -> StateRet:
 
 
 def post_func_state(char: str, stack: List[str]) -> StateRet:
-    """Auxillary function called when func_state is
-    successfully completed.
+    """Auxiliary function.
 
+    Only called when func_state is successfully completed.
     Appends ( to the stack.
 
     Args:
@@ -407,7 +407,9 @@ def minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
 
 
 def leave_minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
-    """Auxiliary state called when successfully leaving minus_post_operator_state.
+    """Auxiliary state
+
+    Only called when successfully leaving minus_post_operator_state.
 
     Args:
         char: Current pointed character in the string.
@@ -426,7 +428,9 @@ def leave_minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
 
 
 def negative_unary_state(char: str, stack: List[str]) -> StateRet:
-    """Auxiliary state for adding the negative unary operator to the stack.
+    """Auxiliary state
+
+    Adds the negative unary operator to the stack.
 
     Args:
         char: Current pointed character in the string.
@@ -443,7 +447,7 @@ def negative_unary_state(char: str, stack: List[str]) -> StateRet:
 def minus_minus_post_operator_state(char: str, stack: List[str]):
     """ Auxiliary state.
 
-    Called when an state is minus_post_operator_state and pointed
+    Only called when an state is minus_post_operator_state and pointed
     character is '-'.
 
     Args:

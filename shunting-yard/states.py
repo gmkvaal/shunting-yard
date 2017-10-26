@@ -1,14 +1,8 @@
 from typing import List
 from collections import namedtuple
 from settings import MATH_SYMBOLS
-from token_classifier import append_token
 import re
 
-
-""" Finite State Machine algorithm for parsing mathematical expression into individual tokens.
-
-Supports operators in MATH_SYMBOLS tuple (e.g. not binary operators)
-"""
 
 StateRet = namedtuple('StateRet', ['next_state', 'done', 'increment'])
 
@@ -548,57 +542,3 @@ def comma_state(char: str, stack: List[str]) -> StateRet:
 
     stack.append(char)
     return StateRet(start_state, True, True)
-
-
-def tokenizer(input_string):
-    """Splits an input string into list of tokens by  finite state machine algorithm
-
-    Args:
-        input_string: String to be parsed.
-
-    Returns:
-        List of tokens.
-    """
-
-    stack = []
-    output_list = []
-    idx = 0
-    state = start_state
-
-    while True:
-        char = input_string[idx]
-        return_state = state(char, stack)
-
-        # print(char, state.__name__, stack)
-
-        if return_state.increment:
-            idx += 1
-
-        if return_state.done:
-
-            # print('appending', stack)
-
-            append_token(stack, state, output_list)
-            stack = []
-
-        if idx == len(input_string):
-            if not return_state.done:
-                if stack[-1].isdigit() or stack[-1] == ")":
-                    append_token(stack, return_state.next_state, output_list)
-                else:
-                    raise Exception('Ending expression with non-digit nor right parenthesis')
-            break
-
-        state = return_state.next_state
-
-    return output_list
-
-
-if __name__ == '__main__':
-
-    # input_string = "cos(2)"
-    input_string = '2*-(---2--1)'
-
-    print(tokenizer(input_string))
-
-    print([token['name'] for token in tokenizer(input_string)])

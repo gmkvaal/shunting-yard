@@ -1,5 +1,5 @@
-from tokenizer_FSM import start_state, word_state, num_pre_dot_state, \
-    num_post_dot_state, sym_state, mul_state, div_state, comma_state, tokenizer
+from states import start_state, word_state, num_pre_dot_state, \
+    num_post_dot_state, sym_state, mul_state, div_state, comma_state
 from settings import OPERATOR_LIST, MATH_SYMBOLS
 import pytest
 

@@ -1,48 +1,50 @@
-from shunting_yard import ShuntingYard
-from parser import parser
-
-def test_input_string():
-    """ Testing shunting yard algorithm by giving by asserting output from a input with a known RPL"""
-
-    innstr = "3+4*2/(1-5)^2^3"
-    correct_answer =  	"342*15-23^^/+"
-    input_list = parser(innstr)
-    sy = ShuntingYard(input_list)
-    output_string = sy.output_queue_list_2_string()
-
-    assert output_string == correct_answer
+from shunting_yard import classify_token, number, operator, pop_operators
+from parser_FSM import tokenizer
 
 
-def test_input_string_with_functions():
-    """ Testing shunting yard algorithm by giving by asserting output from a input with a known RPL, including functions"""
+OPERATOR_STACK_0 = []
 
-    innstr = "sin(max(2,3)/3*3.1415)"
-    correct_answer = "23max3/3.1415*sin"
-    input_list = parser(innstr)
-    sy = ShuntingYard(input_list)
-    output_string = sy.output_queue_list_2_string()
+OPERATOR_STACK_1 = [
+                      {
+                       'name': '*',
+                       'value': None,
+                       'type': 'OPERATOR',
+                       'precedence': 3, ''
+                       'associativity': 'LEFT'
+                       },
+                      {
+                       'name': '/',
+                       'value': None,
+                       'type': 'OPERATOR',
+                       'precedence': 3,
+                       'associativity':
+                       'LEFT'
+                       },
+                       {
+                        'name': '**',
+                        'value': None,
+                        'type': 'OPERATOR',
+                        'precedence': 1,
+                        'associativity':
+                        'LEFT'
+                        }
+]
 
-    assert output_string == correct_answer
 
+def test_operator():
 
-def test_input_string_with_algebraic_variable():
-    """ Testing shunting yard algorithm by giving by asserting output from a input with a known RPL, including variables"""
+    token = {
+            'name': '*',
+            'value': None,
+            'type': 'OPERATOR',
+            'precedence': 4,
+            'associativity': 'LEFT'
+     }
 
-    innstr = "2*2*a*a"
-    correct_answer = "22*a*a*"
-    input_list = parser(innstr)
-    sy = ShuntingYard(input_list)
-    output_string = sy.output_queue_list_2_string()
+    output_queue = []
 
-    assert output_string == correct_answer
+    return_state = operator(token, OPERATOR_STACK_1, output_queue)
+    assert return_state == (pop_operators, False)
 
-#def test_read_input_string():
-#    """ Testing shunting yard algorithm by giving by asserting output from a input with a known RPL, including functions"""
-#
-#    innstr = "2x*sin(2x)"
-#    correct_answer = "23max3/3.1415*sin"
-#    sy = ShuntingYard(innstr)
-#    output_queue_list = sy.sort_tokens()
-#    output_string = sy.output_queue_list_2_string(output_queue_list)
-
-#    assert output_string == correct_answer
+    return_state = operator(token, OPERATOR_STACK_0, output_queue)
+    assert return_state == (classify_token, True)

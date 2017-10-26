@@ -1,25 +1,24 @@
 from typing import List
 from collections import namedtuple
 from settings import MATH_SYMBOLS
-from token_classifier import append_token
 import re
 
-
-"""
-Finite State Machine algorithm for parsing mathematical expression.
-
-Supports operators in MATH_SYMBOLS tuple (e.g. not binary operators)
-"""
 
 StateRet = namedtuple('StateRet', ['next_state', 'done', 'increment'])
 
 
 def start_state(char: str, stack: List[str]) -> StateRet:
-    """  Start state. Directs  to respective states.
+    """Start state.
+
+    Called when reading the first character or when a state that has
+    no restriction on the proceeding character.
+
+    Args:
+        char: Current pointed character in the string.
+        stack: List of characters to be merged into tokens.
 
     Returns:
-            Tuple of: next state, if state is complete (never),
-             if read next char, if append char
+        Tuple of: next state, if state is complete, if read next char.
     """
 
     if char.isdigit():
@@ -43,12 +42,19 @@ def start_state(char: str, stack: List[str]) -> StateRet:
 
 
 def func_state(char: str, stack: List[str]) -> StateRet:
-    """ Appends word-characters to stack. Dumps when reaching (.
-    Raises exception if next is not (
+    """Rules for tokenizing word characters,
 
+    Appends word-characters to stack.
+    Dumps char to stack when reaching (.
+
+    Args:
+        char: Current pointed character in the string.
+        stack: List of characters to be merged into tokens.
+
+    Raises:
+         Exception if char is not alphabetical or (
     Returns:
-            Tuple of: next state, if state is complete,
-            if read next char, if append char.
+        Tuple of: next state, if state is complete, if read next char.
     """
 
     if re.match("([a-z]|[A-Z])", char):
@@ -63,12 +69,17 @@ def func_state(char: str, stack: List[str]) -> StateRet:
 
 
 def post_func_state(char: str, stack: List[str]) -> StateRet:
-    """ Only called after func_state. Verifies that the function is followed
-    by an right parenthesis
+    """Auxillary function called when func_state is
+    successfully completed.
+
+    Appends ( to the stack.
+
+    Args:
+        char: Current pointed character in the string.
+        stack: List of characters to be merged into tokens.
 
     Returns:
-        Tuple of: next state, if state is complete,
-        if read next char, if append char.
+        Tuple of: next state, if state is complete, if read next char.
     """
 
     stack.append(char)
@@ -77,13 +88,21 @@ def post_func_state(char: str, stack: List[str]) -> StateRet:
 
 
 def num_pre_dot_state(char: str, stack: List[str]) -> StateRet:
-    """ Appends digits to stack. If reaching dot, switching to
-    num_post_dot_state. Dumps when reaching math symbol / operator.
-    Error if reaching word character, e.g., 2b is not accepted.
+    """Rules for tokenizing numerical characters.
+
+    Appends digits to stack.
+    Switches to num_post_dot_state is char is '.'.
+    Dumps char to stack when reaching a math symbol / operator.
+
+    Args:
+        char: Current pointed character in the string.
+        stack: List of characters to be merged into tokens.
+
+    Raises:
+         Exception if char is alphabetical or '('
 
     Returns:
-            Tuple of: next state, if state is complete,
-            if read next char, if append char.
+        Tuple of: next state, if state is complete, if read next char.
     """
 
     if char.isdigit():
@@ -106,13 +125,20 @@ def num_pre_dot_state(char: str, stack: List[str]) -> StateRet:
 
 
 def num_post_dot_state(char: str, stack: List[str]) -> StateRet:
-    """ Only called after num_pre_dot_state. Appends digits to stack.
-    Dumps when reaching symbol / operator. Error if reaching dot or word
-    character, e.g., 2b or 1.1.1 are not accepted
+    """Rules for tokenizing numerical (decimal) characters.
+
+    Only called after num_pre_dot_state.
+    Dumps char to stack when reaching a math symbol / operator.
+
+    Args:
+        char: Current pointed character in the string.
+        stack: List of characters to be merged into tokens.
+
+    Raises:
+         Exception if char is alphabetical or '('
 
     Returns:
-            Tuple of: next state, if state is complete,
-            if read next char, if append char.
+        Tuple of: next state, if state is complete, if read next char.
     """
 
     if char.isdigit():
@@ -134,12 +160,17 @@ def num_post_dot_state(char: str, stack: List[str]) -> StateRet:
 
 
 def sym_state(char: str, stack: List[str]) -> StateRet:
-    """ Appends symbols / operators. If char is * or /,
-    respective states are called in case token is ** or //.
+    """Rules for tokenizing mathematic symbols / operators.
+
+    Appends mathematical symbols / operator to stack and
+    directs to respective states.
+
+    Args:
+        char: Current pointed character in the string.
+        stack: List of characters to be merged into tokens.
 
     Returns:
-            Tuple of: next state, if state is complete,
-            if read next char, if append char
+        Tuple of: next state, if state is complete, if read next char.
     """
 
     if char in '(':
@@ -172,12 +203,20 @@ def sym_state(char: str, stack: List[str]) -> StateRet:
 
 
 def left_parenthesis_state(char: str, stack: List[str]) -> StateRet:
-    """ Called after sym_state. Raises exception if the next
-    char is a non-additive operator
+    """Rules for tokenizing characters after '('.
+
+    Only called after sym_state. Raises exception if the next
+    char is a non-additive operator.
+
+    Args:
+        char: Current pointed character in the string.
+        stack: List of characters to be merged into tokens.
+
+    Raises:
+        Exception if char is a non-additive operator or ')'.
 
     Returns:
-        Tuple of: next state, if state is complete,
-        if read next char, if append char
+        Tuple of: next state, if state is complete, if read next char.
     """
 
     if char in MATH_SYMBOLS and char not in ['+', '-', '(']:
@@ -195,12 +234,20 @@ def left_parenthesis_state(char: str, stack: List[str]) -> StateRet:
 
 
 def right_parenthesis_state(char: str, stack: List[str]) -> StateRet:
-    """ Called after sym_state. Raises exception if the next
-    char is a number or a letter (operator)
+    """Rules for tokenizing characters after ')'.
+
+    Called after sym_state. Raises exception if the next
+    char is a number or a letter (e.g., operator).
+
+    Args:
+        char: Current pointed character in the string.
+        stack: List of characters to be merged into tokens.
+
+    Raises:
+        Exception if char is a number or a letter.
 
     Returns:
-        Tuple of: next state, if state is complete,
-        if read next char, if append char
+        Tuple of: next state, if state is complete, if read next char.
     """
 
     if re.match('[0-9]', char):
@@ -216,13 +263,17 @@ def right_parenthesis_state(char: str, stack: List[str]) -> StateRet:
 
 
 def operator_state(char: str, stack: List[str]) -> StateRet:
-    """ Called when a non-additive operator is complete.
-    Raises exception if the next char is a non additive
-    operator or right parenthesis.
+    """Rules for tokenizing characters after (non-additive) operators.
 
-     Returns:
-        Tuple of: next state, if state is complete,
-        if read next char, if append char
+    Raises:
+        Exception if char is an additive operator or ')'.
+
+    Args:
+        char: Current pointed character in the string.
+        stack: List of characters to be merged into tokens.
+
+    Returns:
+        Tuple of: next state, if state is complete, if read next char.
     """
 
     if char in MATH_SYMBOLS and char not in ['(', '+', '-']:
@@ -239,13 +290,19 @@ def operator_state(char: str, stack: List[str]) -> StateRet:
 
 
 def plus_state(char: str, stack: List[str]) -> StateRet:
-    """ Called when the previous char was a + not preceded by an operator.
-    Switches signs if next is -, raises exception of next a non additive
-    operator
+    """Rules for tokenizing characters after '+'.
 
-     Returns:
-        Tuple of: next state, if state is complete,
-        if read next char, if append char
+    Replaces '+' to '-' if char is '-'.
+
+    Args:
+        char: Current pointed character in the string.
+        stack: List of characters to be merged into tokens.
+
+    Raises:
+        Exception if char is a non additive operator or ')'.
+
+    Returns:
+        Tuple of: next state, if state is complete, if read next char.
     """
 
     if char == '+':
@@ -264,13 +321,19 @@ def plus_state(char: str, stack: List[str]) -> StateRet:
 
 
 def minus_state(char: str, stack: List[str]) -> StateRet:
-    """ Called when the previous char was a - not preceded by an operator.
-    Switches signs if next is -, raises exception of next a non additive
-    operator
+    """Rules for tokenizing characters after '+'.
 
-     Returns:
-        Tuple of: next state, if state is complete,
-        if read next char, if append char
+    Replaces '-' to '+' if char is '-'.
+
+    Args:
+        char: Current pointed character in the string.
+        stack: List of characters to be merged into tokens.
+
+    Raises:
+        Exception if char is a non additive operator or ')'.
+
+    Returns:
+        Tuple of: next state, if state is complete, if read next char.
     """
 
     if char == '-':
@@ -290,11 +353,17 @@ def minus_state(char: str, stack: List[str]) -> StateRet:
 
 
 def plus_post_operator_state(char: str, stack: List[str]) -> StateRet:
-    """ Called when the previous char was a + preceded by an operator.
-    Raises exception of next a non additive operator
+    """Rules for tokenizing additive operators after non additives.
 
-     Returns:
-        Tuple of: next state, if state is complete, if read next char, if append char
+    Args:
+        char: Current pointed character in the string.
+        stack: List of characters to be merged into tokens.
+
+    Raises:
+        Exception if char is a non additive operator or ')'.
+
+    Returns:
+        Tuple of: next state, if state is complete, if read next char.
     """
 
     if char == '+':
@@ -311,11 +380,17 @@ def plus_post_operator_state(char: str, stack: List[str]) -> StateRet:
 
 
 def minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
-    """ Called when the previous char was a - preceded by an operator.
-    Raises exception of next a non additive operator
+    """Rules for tokenizing additive operators after non additives.
 
-     Returns:
-        Tuple of: next state, if state is complete, if read next char, if append char
+    Args:
+        char: Current pointed character in the string.
+        stack: List of characters to be merged into tokens.
+
+    Raises:
+        Exception if char is a non additive operator or ')'.
+
+    Returns:
+        Tuple of: next state, if state is complete, if read next char.
     """
 
     if char == '-':
@@ -332,10 +407,14 @@ def minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
 
 
 def leave_minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
-    """ Only called after minus_post_operator_state. Pops if minus in stack
+    """Auxiliary state called when successfully leaving minus_post_operator_state.
+
+    Args:
+        char: Current pointed character in the string.
+        stack: List of characters to be merged into tokens.
 
     Returns:
-         negative_unary_state, False, False
+        Tuple of: next state, if state is complete, if read next char.
     """
     if len(stack) == 0:
         pass
@@ -346,8 +425,34 @@ def leave_minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
     return StateRet(negative_unary_state, False, False)
 
 
+def negative_unary_state(char: str, stack: List[str]) -> StateRet:
+    """Auxiliary state for adding the negative unary operator to the stack.
+
+    Args:
+        char: Current pointed character in the string.
+        stack: List of characters to be merged into tokens.
+
+    Returns:
+        Tuple of: next state, if state is complete, if read next char.
+    """
+
+    stack.append('-u')
+    return StateRet(start_state, True, False)
+
+
 def minus_minus_post_operator_state(char: str, stack: List[str]):
-    """ Only called when an state is minus_post_operator_state and next is -"""
+    """ Auxiliary state.
+
+    Called when an state is minus_post_operator_state and pointed
+    character is '-'.
+
+    Args:
+        char: Current pointed character in the string.
+        stack: List of characters to be merged into tokens.
+
+    Returns:
+        Tuple of: next state, if state is complete, if read next char.
+    """
 
     if stack == []:
         stack.append(char)
@@ -358,21 +463,17 @@ def minus_minus_post_operator_state(char: str, stack: List[str]):
         return StateRet(plus_post_operator_state, False, True)
 
 
-def negative_unary_state(char: str, stack: List[str]) -> StateRet:
-    """ Only called if the minus_post_operator_state is followed by an
-    accepted character. Appends the unitary operator to the stack
-
-    Returns:
-        Tuple of: next state, if state is complete, if read next char, if append char
-    """
-
-    stack.append('-u')
-    return StateRet(start_state, True, False)
-
-
 def mul_state(char: str, stack: List[str]) -> StateRet:
-    """ Only called if previous char was *. Dumps ** if (current) char is *,
-    else returns start_state
+    """Rules for tokenizing characters after '*'-
+
+    Dumps ** if char is *.
+
+    Args:
+        char: Current pointed character in the string.
+        stack: List of characters to be merged into tokens.
+
+    Raises:
+        Exception if char is a non additive operator, ')' or '*'.
 
     Returns:
         Tuple of: next state, if state is complete, if read next char, if append char
@@ -396,8 +497,16 @@ def mul_state(char: str, stack: List[str]) -> StateRet:
 
 
 def div_state(char: str, stack: List[str]) -> StateRet:
-    """ Only called if previous char was *. Dumps ** if (current) char is *,
-    else returns start_state
+    """Rules for tokenizing characters after '*'-
+
+    Dumps // if char is /.
+
+    Args:
+        char: Current pointed character in the string.
+        stack: List of characters to be merged into tokens.
+
+    Raises:
+        Exception if char is a non additive operator, ')' or '*'.
 
     Returns:
         Tuple of: next state, if state is complete, if read next char, if append char
@@ -421,55 +530,15 @@ def div_state(char: str, stack: List[str]) -> StateRet:
 
 
 def comma_state(char: str, stack: List[str]) -> StateRet:
-    """Only called when char is comma"""
+    """Only called when char is comma
+
+    Args:
+        char: Current pointed character in the string.
+        stack: List of characters to be merged into tokens.
+
+    Returns:
+        Tuple of: next state, if state is complete, if read next char, if append char
+    """
 
     stack.append(char)
     return StateRet(start_state, True, True)
-
-
-def tokenizer(input_string):
-    """Splits an input string into list of tokens by
-    a finite state machine algorithm"""
-
-    stack = []
-    output_list = []
-    idx = 0
-    state = start_state
-
-    while True:
-        char = input_string[idx]
-        return_state = state(char, stack)
-
-        # print(char, state.__name__, stack)
-
-        if return_state.increment:
-            idx += 1
-
-        if return_state.done:
-
-            # print('appending', stack)
-
-            append_token(stack, state, output_list)
-            stack = []
-
-        if idx == len(input_string):
-            if not return_state.done:
-                if stack[-1].isdigit() or stack[-1] == ")":
-                    append_token(stack, return_state.next_state, output_list)
-                else:
-                    raise Exception('Ending expression with non-digit nor right parenthesis')
-            break
-
-        state = return_state.next_state
-
-    return output_list
-
-
-if __name__ == '__main__':
-
-    # input_string = "cos(2)"
-    input_string = '2*-(---2--1)'
-
-    print(tokenizer(input_string))
-
-    print([token['name'] for token in tokenizer(input_string)])

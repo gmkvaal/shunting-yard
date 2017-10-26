@@ -8,6 +8,8 @@ StateRet = namedtuple('StateRet', ['next_state', 'increment'])
 
 def classify_token(token: dict, operator_stack: List[str], output_queue: List[str]) -> StateRet:
 
+    print(token)
+
     if token['type'] == 'NUMBER':
         output_queue.append(token)
         return StateRet(classify_token, True)
@@ -15,16 +17,12 @@ def classify_token(token: dict, operator_stack: List[str], output_queue: List[st
     if token['type'] == 'OPERATOR':
         return StateRet(operator, False)
 
-    if token['type'] == 'LEFT_BRACKET':
-        return StateRet(operator, False)
+    if token['type'] == 'LEFT_PARENTHESIS':
+        operator_stack.append(token)
+        return StateRet(classify_token, True)
 
-    if token['type'] == 'RIGHT_BRACKET':
-        return StateRet(operator, False)
-
-
-def number(token: dict, operator_stack: List[str], output_queue: List[str]) -> StateRet:
-
-    return StateRet(num_pre_dot_state, True)
+    if token['type'] == 'RIGHT_PARENTHESIS':
+        return StateRet(right_bracket, False)
 
 
 def operator(token: dict, operator_stack: List[str], output_queue: List[str]) -> StateRet:
@@ -51,14 +49,18 @@ def pop_operators(token: dict, operator_stack: List[str], output_queue: List[str
         return StateRet(classify_token, True)
 
 
-def left_bracket(token: dict, operator_stack: List[str], output_queue: List[str]) -> StateRet:
+def right_bracket(token: dict, operator_stack: List[str], output_queue: List[str]) -> StateRet:
 
-    pass
+    if operator_stack == []:
+        raise Exception('Mismatching parentheses')
 
+    elif operator_stack[-1]['type'] != 'LEFT_PARENTHESIS':
+        output_queue.append(operator_stack.pop())
+        return StateRet(right_bracket, True)
 
-def left_bracket(token: dict, operator_stack: List[str], output_queue: List[str]) -> StateRet:
-
-    pass
+    else:
+        operator_stack.pop()
+        return StateRet(classify_token, True)
 
 
 def empty_operator_stack(operator_stack: List[str], output_queue: List[str]) -> None:
@@ -99,7 +101,7 @@ def shunting_yard(input_string):
 
 if __name__ == '__main__':
 
-    input_string = '3/4*2'
+    input_string = '3/4*(2)'
     shunting_yard(input_string)
 
         

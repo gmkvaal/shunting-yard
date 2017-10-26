@@ -10,7 +10,7 @@ def classify_token(token: dict, operator_stack: List[str], output_queue: List[st
 
     if token['type'] == 'NUMBER':
         output_queue.append(token)
-        return StateRet(classify_token, False)
+        return StateRet(classify_token, True)
 
     if token['type'] == 'OPERATOR':
         return StateRet(operator, False)
@@ -41,23 +41,14 @@ def pop_operators(token: dict, operator_stack: List[str], output_queue: List[str
 
     if (len(operator_stack) > 0
            and operator_stack[-1]['precedence'] >= token['precedence']
-           and operator_stack[-1]['assiciativity'] == 'LEFT'):
+           and operator_stack[-1]['associativity'] == 'LEFT'):
 
-        output_queue(operator_stack.pop())
-        return StateRet(pop_operators, False)
+        output_queue.append(operator_stack.pop())
+        return StateRet(pop_operators, True)
 
     else:
         operator_stack.append(token)
-        return StateRet(classify_token, False)
-
-
-
-
-
-    else:
-        return StateRet(pop_operators, False)
-
-    pass
+        return StateRet(classify_token, True)
 
 
 def left_bracket(token: dict, operator_stack: List[str], output_queue: List[str]) -> StateRet:
@@ -68,33 +59,44 @@ def left_bracket(token: dict, operator_stack: List[str], output_queue: List[str]
 def left_bracket(token: dict, operator_stack: List[str], output_queue: List[str]) -> StateRet:
 
     pass
+
+
+def empty_operator_stack(operator_stack: List[str], output_queue: List[str]) -> None:
+    """ Pops remaining operators from the operator stack to the output queue"""
+
+    while len(operator_stack) > 0:
+        output_queue.append(operator_stack.pop())
 
 
 def shunting_yard(input_string):
 
     operator_stack = []
     output_queue = []
-
-    input_string = '2+2'
-
     token_list = tokenizer(input_string)
+
+    state = classify_token
 
     idx = 0
     while True:
+        token = token_list[idx]
+        return_state = state(token, operator_stack, output_queue)
 
-        token_dict = token_list[idx]
-        token = token_dict['name']
+        if return_state.increment:
+            idx += 1
 
-        print(token_dict)
+        state = return_state.next_state
 
-        idx += 1
         if idx == len(token_list):
+
+            empty_operator_stack(operator_stack, output_queue)
+
             break
 
+    print([token['name'] for token in output_queue])
 
 if __name__ == '__main__':
 
-    pass
-
+    input_string = '3/4*2'
+    shunting_yard(input_string)
 
         

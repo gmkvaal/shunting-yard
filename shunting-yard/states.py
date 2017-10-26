@@ -468,7 +468,7 @@ def minus_minus_post_operator_state(char: str, stack: List[str]):
 
 
 def mul_state(char: str, stack: List[str]) -> StateRet:
-    """Rules for tokenizing characters after '*'-
+    """Rules for tokenizing characters after '*'
 
     Dumps ** if char is *.
 
@@ -501,7 +501,7 @@ def mul_state(char: str, stack: List[str]) -> StateRet:
 
 
 def div_state(char: str, stack: List[str]) -> StateRet:
-    """Rules for tokenizing characters after '*'-
+    """Rules for tokenizing characters after '*'
 
     Dumps // if char is /.
 

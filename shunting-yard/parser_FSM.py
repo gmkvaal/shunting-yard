@@ -5,8 +5,7 @@ from token_classifier import append_token
 import re
 
 
-"""
-Finite State Machine algorithm for parsing mathematical expression.
+""" Finite State Machine algorithm for parsing mathematical expression into individual tokens.
 
 Supports operators in MATH_SYMBOLS tuple (e.g. not binary operators)
 """

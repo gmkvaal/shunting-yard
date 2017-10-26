@@ -480,7 +480,7 @@ def mul_state(char: str, stack: List[str]) -> StateRet:
         Exception if char is a non additive operator, ')' or '*'.
 
     Returns:
-        Tuple of: next state, if state is complete, if read next char, if append char
+        Tuple of: next state, if state is complete, if read next charr.
     """
 
     if char == '*':
@@ -513,7 +513,7 @@ def div_state(char: str, stack: List[str]) -> StateRet:
         Exception if char is a non additive operator, ')' or '*'.
 
     Returns:
-        Tuple of: next state, if state is complete, if read next char, if append char
+        Tuple of: next state, if state is complete, if read next char.
     """
 
     if char == '/':

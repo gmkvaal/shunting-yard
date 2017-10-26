@@ -44,7 +44,7 @@ def pop_operators(token: dict, operator_stack: List[str], output_queue: List[str
            and operator_stack[-1]['associativity'] == 'LEFT'):
 
         output_queue.append(operator_stack.pop())
-        return StateRet(pop_operators, True)
+        return StateRet(pop_operators, False)
 
     else:
         operator_stack.append(token)
@@ -79,6 +79,9 @@ def shunting_yard(input_string):
     idx = 0
     while True:
         token = token_list[idx]
+
+        print(token['name'], state.__name__, operator_stack)
+
         return_state = state(token, operator_stack, output_queue)
 
         if return_state.increment:

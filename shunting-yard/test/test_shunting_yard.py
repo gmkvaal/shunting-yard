@@ -63,7 +63,7 @@ def test_pop_operators_1():
     output_queue = []
 
     return_state = pop_operators(token, OPERATOR_STACK_1, output_queue)
-    assert return_state == (pop_operators, True)
+    assert return_state == (pop_operators, False)
     assert output_queue[-1] == {
                         'name': '*',
                         'value': None,

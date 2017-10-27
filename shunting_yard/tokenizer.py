@@ -1,5 +1,5 @@
-from states import start_state
-from token_classifier import append_token
+from .states import start_state
+from .token_classifier import append_token
 
 
 def tokenizer(input_string):

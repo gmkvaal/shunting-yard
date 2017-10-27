@@ -1,6 +1,6 @@
-from states import operator_state, num_pre_dot_state, func_state, \
+from .states import operator_state, num_pre_dot_state, func_state, \
     num_post_dot_state, sym_state, mul_state, div_state, comma_state
-from token_classifier import append_token
+from .token_classifier import append_token
 import pytest
 
 

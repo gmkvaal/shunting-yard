@@ -1,6 +1,6 @@
 from typing import List
 from collections import namedtuple
-from settings import MATH_SYMBOLS
+#from shunting_yard import settings
 import re
 
 
@@ -444,7 +444,7 @@ def negative_unary_state(char: str, stack: List[str]) -> StateRet:
     return StateRet(start_state, True, False)
 
 
-def minus_minus_post_operator_state(char: str, stack: List[str]):
+def minus_minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
     """ Auxiliary state.
 
     Only called when an state is minus_post_operator_state and pointed

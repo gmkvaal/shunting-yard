@@ -1,4 +1,4 @@
-from parser_FSM import tokenizer
+from tokenizer import tokenizer
 from typing import List
 from collections import namedtuple
 

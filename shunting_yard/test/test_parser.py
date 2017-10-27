@@ -1,13 +1,5 @@
-from shunting_yard import classify_token, operator, pop_operators
-from parser_FSM import tokenizer
-
-
-
-
-# DANGEROUS GLOBAL VARIABLE
-
-
-
+from parser import classify_token, operator, pop_operators
+from tokenizer import tokenizer
 
 
 

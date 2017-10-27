@@ -1,10 +1,55 @@
-from typing import List
-from collections import namedtuple
-#from shunting_yard import settings
+from typing import List, NamedTuple, Callable, Tuple, Any, Dict, Optional
+import logging
 import re
 
+from .settings import MATH_SYMBOLS, OPERATOR_LIST
 
-StateRet = namedtuple('StateRet', ['next_state', 'done', 'increment'])
+
+
+class StateRet(NamedTuple):
+    """Docs."""
+
+    next_state: Callable
+    done: bool = False
+    increment: bool = False
+
+
+from functools import wraps
+
+class PythonSyntaxError(SyntaxError):
+    """Docs."""
+
+
+def generic_state(
+        char,
+        stack,
+        defaults: Tuple[Callable, bool, bool],
+        mapping: Optional[Dict[str, Tuple[Any]]] = None,
+        required_chars: Optional[Tuple[str]] = None,
+        illegal_chars: Optional[Tuple[str]] = None,
+        append_to_stack: bool = False,
+):
+    #logger = logging.getLogger(__name__)
+    #logger.debug(f'in state {}; processing {char}')
+
+    if mapping is None:
+        mapping = {}
+
+    if append_to_stack:
+        stack.append(char)
+
+    if char in mapping:
+        return StateRet(*mapping[char])
+
+    if (required_chars is not None) and (char not in required_chars):
+        raise PythonSyntaxError(f'Illegal combination: {char}')
+
+    if char in illegal_chars:
+        raise Exception('wrong')
+        #raise PythonSyntaxError(f'Illegal combination: {char}')
+
+    return StateRet(*defaults)
+
 
 
 def start_state(char: str, stack: List[str]) -> StateRet:
@@ -335,21 +380,20 @@ def minus_state(char: str, stack: List[str]) -> StateRet:
     Returns:
         Tuple of: next state, if state is complete, if read next char.
     """
-
     if char == '-':
         stack.pop()
         stack.append('+')
         return StateRet(plus_state, False, True)
 
-    elif char == '+':
-        return StateRet(minus_state, False, True)
-
-    elif char in MATH_SYMBOLS and char not in ['(', '+', '-']:
-        raise Exception("Illegal combination of operators: {}"
-                        "after additive operator".format(char))
-
-    else:
-        return StateRet(start_state, True, False)
+    return generic_state(
+        char,
+        stack,
+        defaults=(start_state, False, True),
+        mapping={
+            '+': (minus_state, False, True),
+        },
+        required_chars=('(', '-'),
+    )
 
 
 def plus_post_operator_state(char: str, stack: List[str]) -> StateRet:
@@ -457,7 +501,6 @@ def minus_minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
     Returns:
         Tuple of: next state, if state is complete, if read next char.
     """
-
     if stack == []:
         stack.append(char)
         return StateRet(minus_post_operator_state, False, True)
@@ -482,29 +525,30 @@ def mul_state(char: str, stack: List[str]) -> StateRet:
     Returns:
         Tuple of: next state, if state is complete, if read next charr.
     """
-
     if char == '*':
-        stack.append(char)
-        return StateRet(operator_state, True, True)
-
-    if char == '+':
-        return StateRet(plus_post_operator_state, True, False)
-
-    if char == '-':
-        return StateRet(minus_post_operator_state, True, False)
-
-    if char in MATH_SYMBOLS and char not in ['+', '-', '*', '(']:
-        raise Exception('Illegal combination: *{}'.format(char))
+        append_to_stack = True
 
     else:
-        return StateRet(start_state, True, False)
+        append_to_stack = None
+
+    return generic_state(
+        char,
+        stack,
+        defaults=(start_state, True, False),
+        mapping={
+            '*': (operator_state, True, True),
+            '+': (plus_post_operator_state, True, False),
+            '-': (minus_post_operator_state, True, False),
+        },
+        illegal_chars=set(MATH_SYMBOLS).difference(('(')),
+        append_to_stack=append_to_stack
+    )
 
 
 def div_state(char: str, stack: List[str]) -> StateRet:
     """Rules for tokenizing characters after '*'
 
-    Dumps // if char is /.
-
+    Dumps // if char is /.  
     Args:
         char: Current pointed character in the string.
         stack: List of characters to be merged into tokens.
@@ -517,20 +561,23 @@ def div_state(char: str, stack: List[str]) -> StateRet:
     """
 
     if char == '/':
-        stack.append(char)
-        return StateRet(operator_state, True, True)
-
-    if char == '+':
-        return StateRet(plus_post_operator_state, True, False)
-
-    if char == '-':
-        return StateRet(minus_post_operator_state, True, False)
-
-    if char in MATH_SYMBOLS and char not in ['+', '-', '/', '(']:
-        raise Exception('Illegal combination: /{}'.format(char))
+        append_to_stack = True
 
     else:
-        return StateRet(start_state, True, False)
+        append_to_stack = None
+
+    return generic_state(
+        char,
+        stack,
+        defaults=(start_state, True, False),
+        mapping={
+            "/": (operator_state, True, True),
+            "+": (plus_post_operator_state, True, False),
+            "-": (minus_post_operator_state, True, False),
+        },
+        illegal_chars=set(MATH_SYMBOLS).difference(('(')),
+        append_to_stack = append_to_stack
+    )
 
 
 def comma_state(char: str, stack: List[str]) -> StateRet:
@@ -546,3 +593,4 @@ def comma_state(char: str, stack: List[str]) -> StateRet:
 
     stack.append(char)
     return StateRet(start_state, True, True)
+

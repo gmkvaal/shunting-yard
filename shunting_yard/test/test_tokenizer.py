@@ -1,13 +1,16 @@
-#from shunting_yard.states import start_state, func_state, post_func_state, num_pre_dot_state, \
-#    num_post_dot_state, sym_state, mul_state, div_state, comma_state, \
-#    left_parenthesis_state, right_parenthesis_state, operator_state, \
-#    plus_state, minus_state, plus_post_operator_state, minus_post_operator_state, \
-#    minus_minus_post_operator_state, leave_minus_post_operator_state, negative_unary_state
-
-from shunting_yard import states
-
-#from .settings import OPERATOR_LIST, MATH_SYMBOLS
 import pytest
+
+from shunting_yard.states import (
+    start_state, func_state, post_func_state, num_pre_dot_state,
+    num_post_dot_state, sym_state, mul_state, div_state, comma_state,
+    left_parenthesis_state, right_parenthesis_state, operator_state,
+    plus_state, minus_state, plus_post_operator_state, minus_post_operator_state,
+    minus_minus_post_operator_state, leave_minus_post_operator_state, negative_unary_state,
+    PythonSyntaxError,
+)
+    
+
+from shunting_yard.settings import OPERATOR_LIST, MATH_SYMBOLS
 
 """
 def test_tokenizer():

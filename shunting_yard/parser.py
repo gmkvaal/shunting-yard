@@ -1,6 +1,7 @@
-#from .tokenizer import tokenizer
 from typing import List
 from collections import namedtuple
+
+from .tokenizer import tokenizer
 
 
 StateRet = namedtuple('StateRet', ['next_state', 'increment'])
@@ -8,7 +9,7 @@ StateRet = namedtuple('StateRet', ['next_state', 'increment'])
 
 def classify_token(token: dict, operator_stack: List[str], output_queue: List[str]) -> StateRet:
 
-    print(token)
+    #print(token)
 
     if token['type'] == 'NUMBER':
         output_queue.append(token)
@@ -70,7 +71,7 @@ def empty_operator_stack(operator_stack: List[str], output_queue: List[str]) -> 
         output_queue.append(operator_stack.pop())
 
 
-def shunting_yard(input_string):
+def shunting_yard(input_string: str) -> List[str]:
 
     operator_stack = []
     output_queue = []
@@ -82,7 +83,7 @@ def shunting_yard(input_string):
     while True:
         token = token_list[idx]
 
-        print(token['name'], state.__name__, operator_stack)
+        #print(token['name'], state.__name__, operator_stack)
 
         return_state = state(token, operator_stack, output_queue)
 
@@ -98,6 +99,7 @@ def shunting_yard(input_string):
             break
 
     print([token['name'] for token in output_queue])
+    return output_queue
 
 if __name__ == '__main__':
 

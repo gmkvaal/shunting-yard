@@ -1,8 +1,10 @@
+from typing import List, Callable, Any, Dict
+
 from .settings import OPERATOR_LIST, OPERATOR_PRECEDENCE, OPERATOR_ASSOCIATIVITY
 
 # TODO: SIMPLER AND STRONGER METHOD FOR TYPE CHARACHTERIZATION
 
-def append_token(stack, state, output_list):
+def append_token(stack: List[str], state: Callable[[str, List[str]], Any],  output_list: List[Dict[str, Any]]) -> None:
 
     token  = ''.join(stack)
 

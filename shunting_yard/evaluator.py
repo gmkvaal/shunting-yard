@@ -1,1 +1,1 @@
-"""Evaluating expressions in RPN""""
+"""Evaluating expressions in RPN"""

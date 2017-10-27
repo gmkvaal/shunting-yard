@@ -1,8 +1,10 @@
+from typing import List
+
 from .states import start_state
 from .token_classifier import append_token
 
 
-def tokenizer(input_string):
+def tokenizer(input_string: str) -> List[str]:
     """Splits an input string into list of tokens by  finite state machine algorithm
 
     Args:
@@ -10,6 +12,11 @@ def tokenizer(input_string):
 
     Returns:
         List of tokens.
+
+    Example:
+        >>> input_string = '2*-(---2--1)'
+        >>> print(tokenizer(input_string))
+        >>> print([token['name'] for token in tokenizer(input_string)])
     """
 
     stack = []
@@ -44,13 +51,3 @@ def tokenizer(input_string):
         state = return_state.next_state
 
     return output_list
-
-
-if __name__ == '__main__':
-
-    # input_string = "cos(2)"
-    input_string = '2*-(---2--1)'
-
-    print(tokenizer(input_string))
-
-    print([token['name'] for token in tokenizer(input_string)])

@@ -26,8 +26,6 @@ def generic_state(
     #logger = logging.getLogger(__name__)
     #logger.debug(f'in state {}; processing {char}')
 
-    print(char)
-
     if illegal_chars is not None and char in illegal_chars:
         raise Exception('wrong')
         #raise PythonSyntaxError(f'Illegal combination: {char}')
@@ -314,8 +312,8 @@ def operator_state(char: str, stack: List[str]) -> StateRet:
             **{str(letter): (func_state, False, True, False) for letter in string.ascii_letters},
             **{str(digit): (num_pre_dot_state, False, True, False) for digit in string.digits},
             '(': (left_parenthesis_state, False, True, False),
-            '+': (plus_post_operator_state, False, False, False),
-            '-': (minus_post_operator_state, False, False, False),
+            '+': (plus_post_operator_state, False, True, False),
+            '-': (minus_post_operator_state, False, True, False),
             '.': (num_pre_dot_state, False, True, False)
         },
     )
@@ -368,20 +366,28 @@ def minus_state(char: str, stack: List[str]) -> StateRet:
         Exception if char is a non additive operator or ')'.
 
     Returns:
-        Tuple of: next state, if state is complete, if read next char.
+        Call to generic state with char, illegal chars, and mapping from char to:
+        next state, if append char, if state is done, if increment
     """
+
     if char == '-':
         stack.pop()
         stack.append('+')
-        return StateRet(plus_state, False, True)
+        return StateRet(plus_state, False, False, True)
 
     return generic_state(
         char,
-        defaults=(start_state, False, True),
+        illegal_chars = (
+            *(str(sym) for sym in MATH_SYMBOLS if sym not in ['+', '-', '(']),
+            ','
+        ),
         mapping={
-            '+': (minus_state, False, True),
+            **{str(letter): (func_state, False, True, False) for letter in string.ascii_letters},
+            **{str(digit): (num_pre_dot_state, False, True, False) for digit in string.digits},
+            '(': (left_parenthesis_state, False, True, False),
+            '.': (num_pre_dot_state, False, True, False),
+            '+': (minus_state, False, False, True)
         },
-        illegal_chars=set(MATH_SYMBOLS).difference(('(')),
     )
 
 
@@ -392,24 +398,28 @@ def plus_post_operator_state(char: str, stack: List[str]) -> StateRet:
         char: Current pointed character in the string.
         stack: List of characters to be merged into tokens.
 
-    Raises:
-        Exception if char is a non additive operator or ')'.
-
     Returns:
-        Tuple of: next state, if state is complete, if read next char.
+        Call to generic state with char, illegal chars, and mapping from char to:
+        next state, if append char, if state is done, if increment
     """
 
-    if char == '+':
-        return StateRet(plus_post_operator_state, False, True)
+    del stack # Not used in this state
 
-    elif char == '-':
-        return StateRet(minus_post_operator_state, False, False)
-
-    elif char in MATH_SYMBOLS and char not in ['(', '+', '-']:
-        raise Exception('Illegal combination of operators: +{}'.format(char))
-
-    else:
-        return StateRet(start_state, False, False)
+    return generic_state(
+        char,
+        illegal_chars = (
+            *(str(sym) for sym in MATH_SYMBOLS if sym not in ['+', '-', '(']),
+            ','
+        ),
+        mapping={
+            **{str(letter): (func_state, False, False, False) for letter in string.ascii_letters},
+            **{str(digit): (num_pre_dot_state, False, False, False) for digit in string.digits},
+            '(': (left_parenthesis_state, False, False, False),
+            '+': (plus_post_operator_state, False, False, True),
+            '-': (minus_post_operator_state, False, False, True),
+            '.': (num_pre_dot_state, False, False, False)
+        },
+    )
 
 
 def minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
@@ -423,20 +433,27 @@ def minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
         Exception if char is a non additive operator or ')'.
 
     Returns:
-        Tuple of: next state, if state is complete, if read next char.
+        Call to generic state with char, illegal chars, and mapping from char to:
+        next state, if append char, if state is done, if increment
     """
 
-    if char == '-':
-        return StateRet(minus_minus_post_operator_state, False, False)
+    del stack # Not used in this state
 
-    elif char == '+':
-        return StateRet(minus_post_operator_state, False, True)
-
-    elif char in MATH_SYMBOLS and char not in ['(', '+', '-']:
-        raise Exception("Illegal combination of operators: +{}".format(char))
-
-    else:
-        return StateRet(leave_minus_post_operator_state, False, False)
+    return generic_state(
+        char,
+        illegal_chars = (
+            *(str(sym) for sym in MATH_SYMBOLS if sym not in ['+', '-', '(']),
+            ','
+        ),
+        mapping={
+            **{str(letter): (leave_minus_post_operator_state, False, False, False) for letter in string.ascii_letters},
+            **{str(digit): (leave_minus_post_operator_state, False, False, False) for digit in string.digits},
+            '(': (leave_minus_post_operator_state, False, False, False),
+            '+': (minus_post_operator_state, False, False, True),
+            '-': (minus_minus_post_operator_state, False, False, True),
+            '.': (leave_minus_post_operator_state, False, False, False)
+        },
+    )
 
 
 def leave_minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
@@ -449,32 +466,19 @@ def leave_minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
         stack: List of characters to be merged into tokens.
 
     Returns:
-        Tuple of: next state, if state is complete, if read next char.
+        Call to generic state with char, illegal chars, and mapping from char to:
+        next state, if append char, if state is done, if increment
     """
+
     if len(stack) == 0:
         pass
 
     elif stack[-1] == '-':
         stack.pop()
 
-    return StateRet(negative_unary_state, False, False)
-
-
-def negative_unary_state(char: str, stack: List[str]) -> StateRet:
-    """Auxiliary state
-
-    Adds the negative unary operator to the stack.
-
-    Args:
-        char: Current pointed character in the string.
-        stack: List of characters to be merged into tokens.
-
-    Returns:
-        Tuple of: next state, if state is complete, if read next char.
-    """
-
     stack.append('-u')
-    return StateRet(start_state, True, False)
+
+    return StateRet(start_state, False, True, False)
 
 
 def minus_minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
@@ -488,15 +492,16 @@ def minus_minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
         stack: List of characters to be merged into tokens.
 
     Returns:
-        Tuple of: next state, if state is complete, if read next char.
+        Call to generic state with char, illegal chars, and mapping from char to:
+        next state, if append char, if state is done, if increment
     """
+
     if stack == []:
-        stack.append(char)
-        return StateRet(minus_post_operator_state, False, True)
+        return StateRet(plus_post_operator_state, True, False, True)
 
     if stack[-1] == '-':
         stack.pop()
-        return StateRet(plus_post_operator_state, False, True)
+        return StateRet(plus_post_operator_state, False, False, True)
 
 
 def mul_state(char: str, stack: List[str]) -> StateRet:
@@ -512,24 +517,28 @@ def mul_state(char: str, stack: List[str]) -> StateRet:
         Exception if char is a non additive operator, ')' or '*'.
 
     Returns:
-        Tuple of: next state, if state is complete, if read next charr.
+        Call to generic state with char, illegal chars, and mapping from char to:
+        next state, if append char, if state is done, if increment
     """
-    if char == '*':
-        append_to_stack = True
 
-    else:
-        append_to_stack = None
+    assert stack == ['*']
 
     return generic_state(
         char,
-        defaults=(start_state, True, False),
+        illegal_chars=(
+            *(str(sym) for sym in MATH_SYMBOLS if sym not in ['+', '-', '(', '*']),
+            ','
+        ),
         mapping={
-            '*': (operator_state, True, True),
+            **{str(letter): (func_state, False, True, False) for letter in string.ascii_letters},
+            **{str(digit): (num_pre_dot_state, False, True, False) for digit in string.digits},
+            '(': (left_parenthesis_state, False, True, False),
+            '*': (operator_state, True, True, True),
             '+': (plus_post_operator_state, True, False),
             '-': (minus_post_operator_state, True, False),
+            '.': (num_pre_dot_state, False, True, False)
+
         },
-        illegal_chars=set(MATH_SYMBOLS).difference(('(')),
-        append_to_stack=append_to_stack
     )
 
 
@@ -545,25 +554,28 @@ def div_state(char: str, stack: List[str]) -> StateRet:
         Exception if char is a non additive operator, ')' or '*'.
 
     Returns:
-        Tuple of: next state, if state is complete, if read next char.
+        Call to generic state with char, illegal chars, and mapping from char to:
+        next state, if append char, if state is done, if increment
     """
 
-    if char == '/':
-        append_to_stack = True
-
-    else:
-        append_to_stack = None
+    assert stack == ['/']
 
     return generic_state(
         char,
-        defaults=(start_state, True, False),
+        illegal_chars=(
+            *(str(sym) for sym in MATH_SYMBOLS if sym not in ['+', '-', '(', '/']),
+            ','
+        ),
         mapping={
-            "/": (operator_state, True, True),
-            "+": (plus_post_operator_state, True, False),
-            "-": (minus_post_operator_state, True, False),
+            **{str(letter): (func_state, False, True, False) for letter in string.ascii_letters},
+            **{str(digit): (num_pre_dot_state, False, True, False) for digit in string.digits},
+            '(': (left_parenthesis_state, False, True, False),
+            '/': (operator_state, True, True, True),
+            '+': (plus_post_operator_state, True, False),
+            '-': (minus_post_operator_state, True, False),
+            '.': (num_pre_dot_state, False, True, False)
+
         },
-        illegal_chars=set(MATH_SYMBOLS).difference(('(')),
-        append_to_stack = append_to_stack
     )
 
 

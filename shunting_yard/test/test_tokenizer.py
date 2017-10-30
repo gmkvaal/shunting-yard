@@ -5,7 +5,7 @@ from shunting_yard.states import (
     num_post_dot_state, sym_state, mul_state, div_state, comma_state,
     left_parenthesis_state, right_parenthesis_state, operator_state,
     plus_state, minus_state, plus_post_operator_state, minus_post_operator_state,
-    minus_minus_post_operator_state, leave_minus_post_operator_state, negative_unary_state,
+    minus_minus_post_operator_state, leave_minus_post_operator_state,
     PythonSyntaxError,
 )
     
@@ -233,13 +233,13 @@ def test_operator_state():
     stack = []
     char = '+'
     return_state = operator_state(char, stack)
-    assert return_state == (plus_post_operator_state, False, False, False)
+    assert return_state == (plus_post_operator_state, False, True, False)
     assert len(stack) == 0
 
     stack = []
     char = '-'
     return_state = operator_state(char, stack)
-    assert return_state == (minus_post_operator_state, False, False, False)
+    assert return_state == (minus_post_operator_state, False, True, False)
     assert len(stack) == 0
 
     stack = []
@@ -299,63 +299,61 @@ def test_minus_state():
     stack = []
     char = '+'
     return_state = minus_state(char, stack)
-    assert return_state == (minus_state, False, True)
+    assert return_state == (minus_state, False, False, True)
     assert len(stack) == 0
 
     stack = ['-']
     char = '-'
     return_state = minus_state(char, stack)
-    assert return_state == (plus_state, False, True)
+    assert return_state == (plus_state, False, False, True)
     assert stack[-1] == '+'
 
     stack = []
-    for char in MATH_SYMBOLS:
-        if char not in ['+', '-', '(']:
-            with pytest.raises(Exception) as excinfo:
-                plus_state(char, stack)
-
-    for char in "aAzZ1(":
+    for char in "aAzZ":
         return_state = plus_state(char, stack)
-        assert return_state == (start_state, True, False)
+        assert return_state == (func_state, False, True, False)
 
-"""
+    for char in "1234567890.":
+        return_state = plus_state(char, stack)
+        assert return_state == (num_pre_dot_state, False, True, False)
+
+
 def test_plus_post_operator_state():
 
     stack = []
     char = '+'
     return_state = plus_post_operator_state(char, stack)
-    assert return_state == (plus_post_operator_state, False, True)
-    assert len(stack) == 0
+    assert return_state == (plus_post_operator_state, False, False, True)
+    #assert len(stack) == 0
 
     stack = []
     char = '-'
     return_state = plus_post_operator_state(char, stack)
-    assert return_state == (minus_post_operator_state, False, False)
+    assert return_state == (minus_post_operator_state, False, False, True)
     assert len(stack) == 0
 
     stack = []
-    for char in MATH_SYMBOLS:
-        if char not in ['+', '-', '(']:
-            with pytest.raises(Exception) as excinfo:
-                plus_post_operator_state(char, stack)
+    for char in "aAzZ":
+        return_state = plus_post_operator_state(char, stack)
+        assert return_state == (func_state, False, False, False)
 
-    for char in "aAzZ1(":
-        return_state = plus_state(char, stack)
-        assert return_state == (start_state, True, False)
+    for char in "1234567890.":
+        return_state = plus_post_operator_state(char, stack)
+        assert return_state == (num_pre_dot_state, False, False, False)
 
 
 def test_minus_post_operator_state():
 
     stack = []
-    char = '-'
-    return_state = minus_post_operator_state(char, stack)
-    assert return_state == (minus_minus_post_operator_state, False, False)
-    assert len(stack) == 0
-
-    stack = []
     char = '+'
     return_state = minus_post_operator_state(char, stack)
-    assert return_state == (minus_post_operator_state, False, True)
+    assert return_state == (minus_post_operator_state, False, False, True)
+    #assert len(stack) == 0
+
+    stack = []
+    char = '-'
+    return_state = minus_post_operator_state(char, stack)
+    assert return_state == (minus_minus_post_operator_state, False, False, True)
     assert len(stack) == 0
 
     stack = []
@@ -365,24 +363,13 @@ def test_minus_post_operator_state():
                 minus_post_operator_state(char, stack)
 
     stack = []
-    for char in "aAzZ1(":
+    for char in "aAzZ":
         return_state = minus_post_operator_state(char, stack)
-        assert return_state == (leave_minus_post_operator_state, False, False)
+        assert return_state == (leave_minus_post_operator_state, False, False, False)
 
-
-def test_minus_post_operator_state():
-
-    stack = ['-']
-    char = '-'
-    return_state = leave_minus_post_operator_state(char, stack)
-    assert return_state == (negative_unary_state, False, False)
-    assert len(stack) == 0
-
-    stack = []
-    char = '-'
-    return_state = leave_minus_post_operator_state(char, stack)
-    assert return_state == (negative_unary_state, False, False)
-    assert len(stack) == 0
+    for char in "1234567890.":
+        return_state = minus_post_operator_state(char, stack)
+        assert return_state == (leave_minus_post_operator_state, False, False, False)
 
 
 def test_minus_minus_post_operator_state():
@@ -390,23 +377,12 @@ def test_minus_minus_post_operator_state():
     stack = []
     char = '-'
     return_state = minus_minus_post_operator_state(char, stack)
-    assert return_state == (minus_post_operator_state, False, True)
-    assert stack[-1] == '-'
+    assert return_state == (plus_post_operator_state, True, False, True)
 
     stack = ['-']
     char = '-'
     return_state = minus_minus_post_operator_state(char, stack)
-    assert return_state == (plus_post_operator_state, False, True)
-    assert len(stack) == 0
-
-
-def test_negative_unary_state():
-
-    stack = []
-    char = '-'
-    return_state = negative_unary_state(char, stack)
-    assert return_state == (start_state, True, False)
-    assert stack[-1] == '-u'
+    assert return_state == (plus_post_operator_state, False, False, True)
 
 
 def test_mul_state():
@@ -414,26 +390,21 @@ def test_mul_state():
     stack = ['*']
     char = '*'
     return_state = mul_state(char, stack)
-    assert return_state  == (operator_state, True, True)
-    assert stack == ['*', '*']
+    assert return_state  == (operator_state, True, True, True)
+    #assert stack == ['*', '*']
 
-    stack = []
     for char in MATH_SYMBOLS:
         if char not in ['+', '-', '*', '(']:
             with pytest.raises(Exception) as excinfo:
-                return_state = mul_state(char, stack)
+                mul_state(char, stack)
 
-    stack = []
     for char in "aAzZ":
         return_state = mul_state(char, stack)
-        assert return_state == (start_state, True, False)
-        assert stack == []
+        assert return_state == (func_state, False, True, False)
 
-    stack = []
     for char in "1.":
         return_state = mul_state(char, stack)
-        assert return_state == (start_state, True, False)
-        assert stack == []
+        assert return_state == (num_pre_dot_state, False, True, False)
 
 
 def test_div_state():
@@ -441,24 +412,24 @@ def test_div_state():
     stack = ['/']
     char = '/'
     return_state = div_state(char, stack)
-    assert return_state  == (operator_state, True, True)
-    assert stack == ['/', '/']
+    assert return_state  == (operator_state, True, True, True)
+    #assert stack == ['*', '*']
 
-    stack = []
+    #stack = []
     for char in MATH_SYMBOLS:
         if char not in ['+', '-', '/', '(']:
             with pytest.raises(Exception) as excinfo:
-                return_state = div_state(char, stack)
+                div_state(char, stack)
 
-    stack = []
+    #stack = []
     for char in "aAzZ":
         return_state = div_state(char, stack)
-        assert return_state == (start_state, True, False)
-        assert stack == []
+        assert return_state == (func_state, False, True, False)
+        #assert stack == []
 
-    stack = []
+    #stack = []
     for char in "1.":
         return_state = div_state(char, stack)
-        assert return_state == (start_state, True, False)
-        assert stack == []
-"""
+        assert return_state == (num_pre_dot_state, False, True, False)
+        #assert stack == []
+

@@ -30,6 +30,9 @@ def tokenizer(input_string: str) -> List[str]:
 
         # print(char, state.__name__, stack)
 
+        if return_state.append:
+            stack.append(char)
+
         if return_state.increment:
             idx += 1
 

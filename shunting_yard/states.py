@@ -450,7 +450,7 @@ def minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
             **{str(digit): (leave_minus_post_operator_state, False, False, False) for digit in string.digits},
             '(': (leave_minus_post_operator_state, False, False, False),
             '+': (minus_post_operator_state, False, False, True),
-            '-': (minus_minus_post_operator_state, False, False, True),
+            '-': (minus_minus_post_operator_state, False, False, False),
             '.': (leave_minus_post_operator_state, False, False, False)
         },
     )
@@ -497,7 +497,7 @@ def minus_minus_post_operator_state(char: str, stack: List[str]) -> StateRet:
     """
 
     if stack == []:
-        return StateRet(plus_post_operator_state, True, False, True)
+        return StateRet(minus_post_operator_state, True, False, True)
 
     if stack[-1] == '-':
         stack.pop()
@@ -512,9 +512,6 @@ def mul_state(char: str, stack: List[str]) -> StateRet:
     Args:
         char: Current pointed character in the string.
         stack: List of characters to be merged into tokens.
-
-    Raises:
-        Exception if char is a non additive operator, ')' or '*'.
 
     Returns:
         Call to generic state with char, illegal chars, and mapping from char to:
@@ -534,8 +531,8 @@ def mul_state(char: str, stack: List[str]) -> StateRet:
             **{str(digit): (num_pre_dot_state, False, True, False) for digit in string.digits},
             '(': (left_parenthesis_state, False, True, False),
             '*': (operator_state, True, True, True),
-            '+': (plus_post_operator_state, True, False),
-            '-': (minus_post_operator_state, True, False),
+            '+': (plus_post_operator_state, False, True, False),
+            '-': (minus_post_operator_state, False, True, False),
             '.': (num_pre_dot_state, False, True, False)
 
         },

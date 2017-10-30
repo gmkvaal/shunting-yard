@@ -25,7 +25,7 @@ def append_token(stack: List[str], state: Callable[[str, List[str]], Any],  outp
                             'minus_post_operator_state',
                             'artificial_mul_state',
                             'operator_state',
-                            'negative_unary_state',
+                            'leave_minus_post_operator_state',
                             'post_func_state'
                             ):
 

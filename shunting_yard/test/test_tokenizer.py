@@ -353,7 +353,7 @@ def test_minus_post_operator_state():
     stack = []
     char = '-'
     return_state = minus_post_operator_state(char, stack)
-    assert return_state == (minus_minus_post_operator_state, False, False, True)
+    assert return_state == (minus_minus_post_operator_state, False, False, False)
     assert len(stack) == 0
 
     stack = []
@@ -377,7 +377,7 @@ def test_minus_minus_post_operator_state():
     stack = []
     char = '-'
     return_state = minus_minus_post_operator_state(char, stack)
-    assert return_state == (plus_post_operator_state, True, False, True)
+    assert return_state == (minus_post_operator_state, True, False, True)
 
     stack = ['-']
     char = '-'
@@ -388,6 +388,16 @@ def test_minus_minus_post_operator_state():
 def test_mul_state():
 
     stack = ['*']
+    char = '+'
+    return_state = mul_state(char, stack)
+    assert return_state == (plus_post_operator_state, False, True, False)
+    #assert len(stack) == 0
+
+    char = '-'
+    return_state = mul_state(char, stack)
+    assert return_state == (minus_post_operator_state, False, True, False)
+    #assert len(stack) == 0
+
     char = '*'
     return_state = mul_state(char, stack)
     assert return_state  == (operator_state, True, True, True)

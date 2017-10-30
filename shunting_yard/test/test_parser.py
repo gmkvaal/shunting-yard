@@ -1,5 +1,5 @@
-from parser import classify_token, operator, pop_operators
-from tokenizer import tokenizer
+from shunting_yard.parser import classify_token, operator, pop_operators
+from shunting_yard.tokenizer import tokenizer
 
 
 

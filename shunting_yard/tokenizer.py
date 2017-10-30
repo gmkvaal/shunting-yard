@@ -28,7 +28,7 @@ def tokenizer(input_string: str) -> List[str]:
         char = input_string[idx]
         return_state = state(char, stack)
 
-        # print(char, state.__name__, stack)
+        print(char, state.__name__, stack)
 
         if return_state.append:
             stack.append(char)

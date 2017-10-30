@@ -1,5 +1,112 @@
-from shunting_yard.parser import classify_token, operator, pop_operators
+from shunting_yard.parser import classify_token, operator, pop_operators, right_parenthesis
 from shunting_yard.tokenizer import tokenizer
+
+
+def test_classify_operator():
+
+    operator_stack_1 = [
+        {
+            'name': '*',
+            'value': None,
+            'type': 'OPERATOR',
+            'precedence': 3,
+            'associativity': 'LEFT'
+        }
+    ]
+
+    token = {
+            'name': '*',
+            'value': None,
+            'type': 'OPERATOR',
+            'precedence': 4,
+            'associativity': 'LEFT'
+     }
+
+    output_queue = []
+
+    return_state = classify_token(token, operator_stack_1, output_queue)
+    assert return_state == (operator, False)
+    assert output_queue == []
+
+
+def test_classify_number():
+
+    operator_stack_1 = [
+        {
+            'name': '*',
+            'value': None,
+            'type': 'OPERATOR',
+            'precedence': 3,
+            'associativity': 'LEFT'
+        }
+    ]
+
+    token = {
+            'name': '1',
+            'value': 1.0,
+            'type': 'NUMBER',
+            'precedence': None,
+            'associativity': None
+     }
+
+    output_queue = []
+
+    return_state = classify_token(token, operator_stack_1, output_queue)
+    assert return_state == (classify_token, True)
+    assert output_queue[-1] == token
+
+
+def test_classify_left_parenthesis():
+
+    operator_stack_1 = [
+        {
+            'name': '*',
+            'value': None,
+            'type': 'OPERATOR',
+            'precedence': 3,
+            'associativity': 'LEFT'
+        }
+    ]
+
+    token = {
+            'name': '(',
+            'value': None,
+            'type': 'LEFT_PARENTHESIS',
+            'precedence': None,
+            'associativity': None
+     }
+
+    output_queue = []
+
+    return_state = classify_token(token, operator_stack_1, output_queue)
+    assert return_state == (classify_token, True)
+    assert operator_stack_1[-1] == token
+
+
+def test_classify_right_parenthesis():
+
+    operator_stack_1 = [
+        {
+            'name': '*',
+            'value': None,
+            'type': 'OPERATOR',
+            'precedence': 3,
+            'associativity': 'LEFT'
+        }
+    ]
+
+    token = {
+            'name': ')',
+            'value': None,
+            'type': 'RIGHT_PARENTHESIS',
+            'precedence': None,
+            'associativity': None
+     }
+
+    output_queue = []
+
+    return_state = classify_token(token, operator_stack_1, output_queue)
+    assert return_state == (right_parenthesis, False)
 
 
 

@@ -28,7 +28,7 @@ def tokenizer(input_string: str) -> List[str]:
         char = input_string[idx]
         return_state = state(char, stack)
 
-        print(char, state.__name__, stack)
+        #print(char, state.__name__, stack)
 
         if return_state.append:
             stack.append(char)
@@ -40,13 +40,13 @@ def tokenizer(input_string: str) -> List[str]:
 
             # print('appending', stack)
 
-            append_token(stack, state, output_list)
+            append_token(stack, output_list)
             stack = []
 
         if idx == len(input_string):
             if not return_state.done:
                 if stack[-1].isdigit() or stack[-1] == ")":
-                    append_token(stack, return_state.next_state, output_list)
+                    append_token(stack, output_list)
                 else:
                     raise Exception('Ending expression with non-digit nor right parenthesis')
             break

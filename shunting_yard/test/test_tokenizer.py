@@ -199,11 +199,11 @@ def test_left_parenthesis_state():
     stack = []
     for char in "aAzZ":
         return_state = left_parenthesis_state(char, stack)
-        assert return_state == (func_state, False, True, False)
+        assert return_state == (func_state, False, False, False)
 
     for char in "123456789.":
         return_state = left_parenthesis_state(char, stack)
-        assert return_state == (num_pre_dot_state, False, True, False)
+        assert return_state == (num_pre_dot_state, False, False, False)
 
 
 def test_right_parenthesis_state():

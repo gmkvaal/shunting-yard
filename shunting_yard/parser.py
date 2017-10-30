@@ -23,7 +23,7 @@ def classify_token(token: dict, operator_stack: List[str], output_queue: List[st
         return StateRet(classify_token, True)
 
     if token['type'] == 'RIGHT_PARENTHESIS':
-        return StateRet(right_bracket, False)
+        return StateRet(right_parenthesis, False)
 
 
 def operator(token: dict, operator_stack: List[str], output_queue: List[str]) -> StateRet:
@@ -50,14 +50,14 @@ def pop_operators(token: dict, operator_stack: List[str], output_queue: List[str
         return StateRet(classify_token, True)
 
 
-def right_bracket(token: dict, operator_stack: List[str], output_queue: List[str]) -> StateRet:
+def right_parenthesis(token: dict, operator_stack: List[str], output_queue: List[str]) -> StateRet:
 
     if operator_stack == []:
         raise Exception('Mismatching parentheses')
 
     elif operator_stack[-1]['type'] != 'LEFT_PARENTHESIS':
         output_queue.append(operator_stack.pop())
-        return StateRet(right_bracket, True)
+        return StateRet(right_parenthesis, True)
 
     else:
         operator_stack.pop()
@@ -98,12 +98,8 @@ def shunting_yard(input_string: str) -> List[str]:
 
             break
 
-    print([token['name'] for token in output_queue])
     return output_queue
 
-if __name__ == '__main__':
 
-    input_string = '3/4*(2)'
-    shunting_yard(input_string)
 
         

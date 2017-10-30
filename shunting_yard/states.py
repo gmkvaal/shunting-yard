@@ -245,9 +245,9 @@ def left_parenthesis_state(char: str, stack: List[str]) -> StateRet:
             '+': (plus_post_operator_state, False, False, False),
             '-': (minus_post_operator_state, False, False, False),
             '(': (left_parenthesis_state, True, True, True),
-            **{str(digit): (num_pre_dot_state, False, True, False) for digit in string.digits},
-            **{str(letter): (func_state, False, True, False) for letter in string.ascii_letters},
-            '.': (num_pre_dot_state, False, True, False),
+            **{str(digit): (num_pre_dot_state, False, False, False) for digit in string.digits},
+            **{str(letter): (func_state, False, False, False) for letter in string.ascii_letters},
+            '.': (num_pre_dot_state, False, False, False),
 
         },
     )

@@ -8,6 +8,17 @@ StateRet = namedtuple('StateRet', ['next_state', 'increment'])
 
 
 def classify_token(token: dict, operator_stack: List[str], output_queue: List[str]) -> StateRet:
+    """Classifies tokens
+
+    Args:
+        char: Currently read token.
+        operator_stack: Stack of operators
+        output_queue: Tokens in RPN order
+
+    Returns:
+        Tuple of: Next state, if increment
+
+    """
 
     print(token['name'], [operator['name'] for operator in output_queue],
           [operator['name'] for operator in operator_stack])
@@ -35,6 +46,21 @@ def classify_token(token: dict, operator_stack: List[str], output_queue: List[st
 
 
 def operator(token: dict, operator_stack: List[str], output_queue: List[str]) -> StateRet:
+    """Called when a token is classified as an operator
+
+    Appends to stack of the operator stack is empty, if the last token
+    in the stack is a function, or if the token is right associative.
+    Else, pops operators from the stack
+
+    Args:
+        char: Currently read token.
+        operator_stack: Stack of operators
+        output_queue: Tokens in RPN order
+
+    Returns:
+        Tuple of: Next state, if increment
+
+    """
 
     del output_queue # Not used in this state
 
@@ -51,9 +77,20 @@ def operator(token: dict, operator_stack: List[str], output_queue: List[str]) ->
 
 
 def pop_operators(token: dict, operator_stack: List[str], output_queue: List[str]) -> StateRet:
+    """Pops operators from the stack
 
-    print('POPPING', token['name'], [operator['name'] for operator in operator_stack])
+    Operators are popped from the operator stack to the output queue
+    until reaching an operator with lower precedence or the stack is empty
 
+    Args:
+        char: Currently read token.
+        operator_stack: Stack of operators
+        output_queue: Tokens in RPN order
+
+    Returns:
+        Tuple of: Next state, if increment
+
+    """
     if (len(operator_stack) > 0
             and operator_stack[-1]['precedence'] is not None
             and operator_stack[-1]['precedence'] >= token['precedence']
@@ -68,6 +105,20 @@ def pop_operators(token: dict, operator_stack: List[str], output_queue: List[str
 
 
 def right_parenthesis(token: dict, operator_stack: List[str], output_queue: List[str]) -> StateRet:
+    """Called when a token is classified as a right parenthesis
+
+    Operators are popped from the operator stack to the output queue
+    until reaching a left parenthesis
+
+    Args:
+        char: Currently read token.
+        operator_stack: Stack of operators
+        output_queue: Tokens in RPN order
+
+    Returns:
+        Tuple of: Next state, if increment
+
+    """
 
     del token # Not used in this state
 
@@ -84,6 +135,19 @@ def right_parenthesis(token: dict, operator_stack: List[str], output_queue: List
 
 
 def post_right_parenthesis(token: dict, operator_stack: List[str], output_queue: List[str]) -> StateRet:
+    """Called after brackets are matched
+
+    If a function is atop of the stack it is poped to the output queue
+
+    Args:
+        char: Currently read token.
+        operator_stack: Stack of operators
+        output_queue: Tokens in RPN order
+
+    Returns:
+        Tuple of: Next state, if increment
+
+    """
 
     if len(operator_stack) > 0 and operator_stack[-1]['type'] == 'FUNCTION':
         output_queue.append(operator_stack.pop())
@@ -92,13 +156,29 @@ def post_right_parenthesis(token: dict, operator_stack: List[str], output_queue:
 
 
 def empty_operator_stack(operator_stack: List[str], output_queue: List[str]) -> None:
-    """ Pops remaining operators from the operator stack to the output queue"""
+    """ Pops remaining operators from the operator stack to the output queue
+
+    Args:
+        char: Currently read token.
+        operator_stack: Stack of operators
+        output_queue: Tokens in RPN order
+    """
 
     while len(operator_stack) > 0:
         output_queue.append(operator_stack.pop())
 
 
 def shunting_yard(input_string: str) -> List[str]:
+    """ Engine of shunting yard parser finite state machine algorithm
+
+    Args:
+        input_string: A mathematical expression
+
+    Returns:
+        A list of tokens ordered in Reverse Polish Notation
+
+    """
+
 
     operator_stack = []
     output_queue = []

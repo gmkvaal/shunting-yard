@@ -1,62 +1,89 @@
-from .states import operator_state, num_pre_dot_state, func_state, \
-    num_post_dot_state, sym_state, mul_state, div_state, comma_state
-from .token_classifier import append_token
 import pytest
+
+from shunting_yard.token_classifier import append_token, MATH_SYMBOLS
 
 
 def test_append_operator():
 
-    state = func_state
     stack = ['c', 'o', 's']
     output_list = []
 
-    append_token(stack, state, output_list)
+    append_token(stack, output_list)
 
-    assert output_list == [{'name': 'cos', 'value': None, 'type': 'OPERATOR',
+    assert output_list == [{'name': 'cos', 'value': None, 'type': 'FUNCTION',
                             'precedence': None, 'associativity': None}]
 
 
 def test_append_unknown_operator():
 
-    state = func_state
     stack = ['w', 'r', 'o', 'n', 'g']
     output_list = []
 
     with pytest.raises(Exception) as excinfo:
-        append_token(stack, state, output_list)
+        append_token(stack, output_list)
 
 
-def test_append_dot_number():
+def test_append_math_symbols_1():
 
-    state = num_pre_dot_state
-    stack = ['1', '.', '2']
+        stack = ['**']
+        output_list = []
+
+        append_token(stack, output_list)
+
+        assert output_list == [{'name': '**', 'value': None, 'type': 'OPERATOR',
+                                'precedence': 1, 'associativity': 'RIGHT'}]
+
+
+def test_append_math_symbols_2():
+
+    stack = ['-u']
     output_list = []
 
-    append_token(stack, state, output_list)
+    append_token(stack, output_list)
 
-    assert output_list == [{'name': '1.2', 'value': 1.2, 'type': 'NUMBER',
+    assert output_list == [{'name': '-u', 'value': None, 'type': 'OPERATOR',
+                            'precedence': 2, 'associativity': 'RIGHT'}]
+
+
+def test_append_math_symbols_3():
+
+        stack = ['*']
+        output_list = []
+
+        append_token(stack, output_list)
+
+        assert output_list == [{'name': '*', 'value': None, 'type': 'OPERATOR',
+                                'precedence': 3, 'associativity': 'LEFT'}]
+
+
+def test_append_number():
+
+    stack = ['3.14']
+    output_list = []
+
+    append_token(stack, output_list)
+
+    assert output_list == [{'name': '3.14', 'value': 3.14, 'type': 'NUMBER',
                             'precedence': None, 'associativity': None}]
 
 
-def test_append_pre_dot_number():
+def test_append_left_parenthesis():
 
-    state = num_post_dot_state
-    stack = ['1']
+    stack = ['(']
     output_list = []
 
-    append_token(stack, state, output_list)
+    append_token(stack, output_list)
 
-    assert output_list == [{'name': '1', 'value': 1, 'type': 'NUMBER',
+    assert output_list == [{'name': '(', 'value': None, 'type': 'LEFT_PARENTHESIS',
                             'precedence': None, 'associativity': None}]
 
 
-def test_append_sym_state():
+def test_append_right_parenthesis():
 
-    state = sym_state
-    stack = ['+']
+    stack = [')']
     output_list = []
 
-    append_token(stack, state, output_list)
+    append_token(stack, output_list)
 
-    assert output_list == [{'name': '+', 'value': None, 'type': 'OPERATOR',
-                            'precedence': 4, 'associativity': 'LEFT'}]
+    assert output_list == [{'name': ')', 'value': None, 'type': 'RIGHT_PARENTHESIS',
+                            'precedence': None, 'associativity': None}]

@@ -5,7 +5,7 @@ import re
 import string
 
 
-from .settings import MATH_SYMBOLS, OPERATOR_LIST
+from .settings import MATH_SYMBOLS
 
 # TODO: DOT STATE AFTER OPERATOR STATE
 
@@ -61,7 +61,6 @@ def start_state(char: str, stack: List[str]) -> StateRet:
             '.': (num_post_dot_state, True, False, True)
         },
     )
-
 
 
 def func_state(char: str, stack: List[str]) -> StateRet:
@@ -309,12 +308,12 @@ def operator_state(char: str, stack: List[str]) -> StateRet:
             ',',
         ),
         mapping = {
-            **{str(letter): (func_state, False, True, False) for letter in string.ascii_letters},
-            **{str(digit): (num_pre_dot_state, False, True, False) for digit in string.digits},
-            '(': (left_parenthesis_state, False, True, False),
-            '+': (plus_post_operator_state, False, True, False),
-            '-': (minus_post_operator_state, False, True, False),
-            '.': (num_pre_dot_state, False, True, False)
+            **{str(letter): (func_state, False, False, False) for letter in string.ascii_letters},
+            **{str(digit): (num_pre_dot_state, False, False, False) for digit in string.digits},
+            '(': (left_parenthesis_state, False, False, False),
+            '+': (plus_post_operator_state, False, False, False),
+            '-': (minus_post_operator_state, False, False, False),
+            '.': (num_pre_dot_state, False, False, False)
         },
     )
 
@@ -587,6 +586,5 @@ def comma_state(char: str, stack: List[str]) -> StateRet:
         Tuple of: next state, if state is complete, if read next char, if append char
     """
 
-    stack.append(char)
-    return StateRet(start_state, True, True)
+    return StateRet(start_state, True, True, True)
 

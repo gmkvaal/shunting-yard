@@ -2,19 +2,20 @@ import math as pymath
 
 pymath_operators = tuple(key for key in pymath.__dict__ if '_' not in key)
 builtin_operators = ('min', 'max', 'abs')
+unaries = ('-u',)
 
-OPERATOR_LIST = pymath_operators + builtin_operators
-MATH_SYMBOLS = ('+', '-', '*', '**', '/', '//', '%', '(', ')')
+FUNCTION_LIST = pymath_operators + builtin_operators
+MATH_SYMBOLS = ('+', '-', '*', '**', '/', '//', '%', '(', ')') + unaries
 
 OPERATOR_PRECEDENCE = {
                        '**': 1,
                        '-u': 2,
+                       '+': 2,
+                       '-': 2,
                        '*': 3,
                        '/': 3,
                        '%': 3,
-                       '//': 3,
-                       '+': 4,
-                       '-': 4
+                       '//': 3
                        }
 
 OPERATOR_ASSOCIATIVITY = {

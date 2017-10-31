@@ -10,7 +10,7 @@ from shunting_yard.states import (
 )
     
 
-from shunting_yard.settings import OPERATOR_LIST, MATH_SYMBOLS
+from shunting_yard.settings import FUNCTION_LIST, MATH_SYMBOLS
 
 """
 def test_tokenizer():
@@ -66,7 +66,6 @@ def test_func_state():
     char = '('
     return_state = func_state(char, stack)
     assert return_state == (post_func_state, False, True, False)
-
 
 
 def test_post_func_state():
@@ -233,29 +232,29 @@ def test_operator_state():
     stack = []
     char = '+'
     return_state = operator_state(char, stack)
-    assert return_state == (plus_post_operator_state, False, True, False)
+    assert return_state == (plus_post_operator_state, False, False, False)
     assert len(stack) == 0
 
     stack = []
     char = '-'
     return_state = operator_state(char, stack)
-    assert return_state == (minus_post_operator_state, False, True, False)
+    assert return_state == (minus_post_operator_state, False, False, False)
     assert len(stack) == 0
 
     stack = []
     char = '('
     return_state = operator_state(char, stack)
-    assert return_state == (left_parenthesis_state, False, True, False)
+    assert return_state == (left_parenthesis_state, False, False, False)
     assert len(stack) == 0
 
     for char in 'aAzZ':
         return_state = operator_state(char, stack)
-        assert return_state == (func_state, False, True, False)
+        assert return_state == (func_state, False, False, False)
         assert len(stack) == 0
 
     for char in '12345':
         return_state = operator_state(char, stack)
-        assert return_state == (num_pre_dot_state, False, True, False)
+        assert return_state == (num_pre_dot_state, False, False, False)
         assert len(stack) == 0
 
 

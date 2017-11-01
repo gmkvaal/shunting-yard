@@ -4,15 +4,13 @@ import logging
 import re
 import string
 
-
+from .error import PythonSyntaxError
 from .settings import MATH_SYMBOLS
-
-# TODO: DOT STATE AFTER OPERATOR STATE
 
 StateRet = namedtuple('StateRet', ['next_state', 'append', 'done', 'increment'])
 
 
-from functools import wraps
+# TODO: DOT STATE AFTER OPERATOR STATE
 
 class PythonSyntaxError(SyntaxError):
     """Raise error when reading illegal combination of characters"""

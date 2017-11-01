@@ -1,6 +1,7 @@
 import pytest
 
-from shunting_yard.parser import classify_token, operator, pop_operators, right_parenthesis
+from shunting_yard.parser import (classify_token, operator, pop_operators,
+                                  right_parenthesis, post_right_parenthesis)
 from shunting_yard.tokenizer import tokenizer
 
 
@@ -255,7 +256,7 @@ def test_right_parenthesis():
     ]
 
     return_state = right_parenthesis(token, operator_stack, output_queue)
-    assert return_state == (classify_token, True)
+    assert return_state == (post_right_parenthesis, False)
 
     operator_stack = [
         {

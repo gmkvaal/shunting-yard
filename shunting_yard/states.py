@@ -15,7 +15,7 @@ StateRet = namedtuple('StateRet', ['next_state', 'append', 'done', 'increment'])
 from functools import wraps
 
 class PythonSyntaxError(SyntaxError):
-    """Docs."""
+    """Raise error when reading illegal combination of characters"""
 
 
 def generic_state(
@@ -26,13 +26,14 @@ def generic_state(
     #logger = logging.getLogger(__name__)
     #logger.debug(f'in state {}; processing {char}')
 
-    if illegal_chars is not None and char in illegal_chars:
-        raise Exception('wrong')
-        #raise PythonSyntaxError(f'Illegal combination: {char}')
-
     if char in mapping:
         return StateRet(*mapping[char])
 
+    elif illegal_chars is not None and char in illegal_chars:
+        raise PythonSyntaxError(f'Misplaced character: {char}')
+
+    else:
+        raise PythonSyntaxError(f'Invalid character: {char}')
 
 def start_state(char: str, stack: List[str]) -> StateRet:
     """Start state.

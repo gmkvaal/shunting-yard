@@ -11,13 +11,12 @@ def classify_token(token: dict, operator_stack: List[str], output_queue: List[st
     """Classifies tokens
 
     Args:
-        char: Currently read token.
+        token: Currently read token.
         operator_stack: Stack of operators
         output_queue: Tokens in RPN order
 
     Returns:
         Tuple of: Next state, if increment
-
     """
 
     print(token['name'], [operator['name'] for operator in output_queue],
@@ -53,7 +52,7 @@ def operator(token: dict, operator_stack: List[str], output_queue: List[str]) ->
     Else, pops operators from the stack
 
     Args:
-        char: Currently read token.
+        token: Currently read token.
         operator_stack: Stack of operators
         output_queue: Tokens in RPN order
 
@@ -62,7 +61,7 @@ def operator(token: dict, operator_stack: List[str], output_queue: List[str]) ->
 
     """
 
-    del output_queue # Not used in this state
+    del output_queue  # Not used in this state
 
     if len(operator_stack) == 0 or operator_stack[-1]['precedence'] is None:
         operator_stack.append(token)
@@ -83,7 +82,7 @@ def pop_operators(token: dict, operator_stack: List[str], output_queue: List[str
     until reaching an operator with lower precedence or the stack is empty
 
     Args:
-        char: Currently read token.
+        token: Currently read token.
         operator_stack: Stack of operators
         output_queue: Tokens in RPN order
 
@@ -111,7 +110,7 @@ def right_parenthesis(token: dict, operator_stack: List[str], output_queue: List
     until reaching a left parenthesis
 
     Args:
-        char: Currently read token.
+        token: Currently read token.
         operator_stack: Stack of operators
         output_queue: Tokens in RPN order
 
@@ -140,7 +139,7 @@ def post_right_parenthesis(token: dict, operator_stack: List[str], output_queue:
     If a function is atop of the stack it is poped to the output queue
 
     Args:
-        char: Currently read token.
+        token: Currently read token.
         operator_stack: Stack of operators
         output_queue: Tokens in RPN order
 
@@ -159,7 +158,7 @@ def empty_operator_stack(operator_stack: List[str], output_queue: List[str]) -> 
     """ Pops remaining operators from the operator stack to the output queue
 
     Args:
-        char: Currently read token.
+        token: Currently read token.
         operator_stack: Stack of operators
         output_queue: Tokens in RPN order
     """

@@ -1,6 +1,7 @@
 from typing import List, Callable, Any, Dict
 import string
 
+from .error import PythonSyntaxError
 from .settings import FUNCTION_LIST, OPERATOR_PRECEDENCE, OPERATOR_ASSOCIATIVITY, MATH_SYMBOLS
 
 
@@ -54,7 +55,7 @@ def append_token(stack: List[str], output_list: List[Dict[str, Any]]) -> None:
 
     else:
         print(token)
-        raise Exception('Unknown type')
+        raise PythonSyntaxError(f'Unable to classify token: {token}')
 
     output_list.append(
         {'name': token,

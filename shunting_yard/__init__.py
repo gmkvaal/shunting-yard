@@ -1,6 +1,5 @@
-all__ = [
-    'parser', 'evaluator',
+__all__ = [
+    'parser', 'evaluator'
 ]
 
-from .parser import parser
-from .evaluator import evaluator
+from . import parser, evaluator

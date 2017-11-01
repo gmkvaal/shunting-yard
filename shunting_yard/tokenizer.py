@@ -1,8 +1,10 @@
-from states import start_state
-from token_classifier import append_token
+from typing import List
+
+from .states import start_state
+from .token_classifier import append_token
 
 
-def tokenizer(input_string):
+def tokenizer(input_string: str) -> List[str]:
     """Splits an input string into list of tokens by  finite state machine algorithm
 
     Args:
@@ -10,6 +12,11 @@ def tokenizer(input_string):
 
     Returns:
         List of tokens.
+
+    Example:
+        >>> input_string = '2*-(---2--1)'
+        >>> print(tokenizer(input_string))
+        >>> print([token['name'] for token in tokenizer(input_string)])
     """
 
     stack = []
@@ -21,7 +28,10 @@ def tokenizer(input_string):
         char = input_string[idx]
         return_state = state(char, stack)
 
-        # print(char, state.__name__, stack)
+        #print(char, state.__name__, stack)
+
+        if return_state.append:
+            stack.append(char)
 
         if return_state.increment:
             idx += 1
@@ -30,13 +40,13 @@ def tokenizer(input_string):
 
             # print('appending', stack)
 
-            append_token(stack, state, output_list)
+            append_token(stack, output_list)
             stack = []
 
         if idx == len(input_string):
             if not return_state.done:
                 if stack[-1].isdigit() or stack[-1] == ")":
-                    append_token(stack, return_state.next_state, output_list)
+                    append_token(stack, output_list)
                 else:
                     raise Exception('Ending expression with non-digit nor right parenthesis')
             break
@@ -44,13 +54,3 @@ def tokenizer(input_string):
         state = return_state.next_state
 
     return output_list
-
-
-if __name__ == '__main__':
-
-    # input_string = "cos(2)"
-    input_string = '2*-(---2--1)'
-
-    print(tokenizer(input_string))
-
-    print([token['name'] for token in tokenizer(input_string)])

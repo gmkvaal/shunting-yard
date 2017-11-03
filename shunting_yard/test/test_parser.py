@@ -219,7 +219,7 @@ def test_pop_operators_2():
             'type': 'OPERATOR',
             'precedence': 4,
             'associativity': 'LEFT'
-     }
+    }
 
     output_queue = []
 
@@ -238,7 +238,7 @@ def test_right_parenthesis():
             'type': 'RIGHT_PARENTHESIS',
             'precedence': None,
             'associativity': None
-     }
+    }
 
     output_queue = []
 

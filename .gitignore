@@ -5,5 +5,5 @@
 TODO.txt
 __pycache__/
 !.gitignore
-.egg*
+*.egg*
 run_test.py

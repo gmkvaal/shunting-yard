@@ -12,9 +12,6 @@ StateRet = namedtuple('StateRet', ['next_state', 'append', 'done', 'increment'])
 
 # TODO: DOT STATE AFTER OPERATOR STATE
 
-class PythonSyntaxError(SyntaxError):
-    """Raise error when reading illegal combination of characters"""
-
 
 def generic_state(
         char,
@@ -32,6 +29,7 @@ def generic_state(
 
     else:
         raise PythonSyntaxError(f'Invalid character: {char}')
+
 
 def start_state(char: str, stack: List[str]) -> StateRet:
     """Start state.

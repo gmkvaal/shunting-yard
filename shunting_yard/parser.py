@@ -1,10 +1,14 @@
 from typing import List
 from collections import namedtuple
+from enum import Enum, auto
 
 from .tokenizer import tokenizer
 
 
 StateRet = namedtuple('StateRet', ['next_state', 'increment'])
+
+class StateType(Enum):
+    NUMBER = auto()
 
 
 def classify_token(token: dict, operator_stack: List[str], output_queue: List[str]) -> StateRet:
@@ -22,7 +26,7 @@ def classify_token(token: dict, operator_stack: List[str], output_queue: List[st
     print(token['name'], [operator['name'] for operator in output_queue],
           [operator['name'] for operator in operator_stack])
 
-    if token['type'] == 'NUMBER':
+    if token['type'] == StateType.NUMBER:
         output_queue.append(token)
         return StateRet(classify_token, True)
 
